@@ -1,0 +1,19 @@
+{
+  "name": "heritage-lbs-course-design",
+  "version": "1.0.0",
+  "description": "基于全国重点文物保护单位 POI 的 LBS REST API 与微信小程序课程设计",
+  "main": "server/server.js",
+  "scripts": {
+    "preprocess": "python server/scripts/preprocess_poi.py",
+    "start": "node server/server.js",
+    "test": "node --test server/tests/*.test.js"
+  },
+  "keywords": [
+    "LBS",
+    "REST",
+    "POI",
+    "wechat-miniprogram"
+  ],
+  "author": "学号-姓名",
+  "license": "MIT"
+}

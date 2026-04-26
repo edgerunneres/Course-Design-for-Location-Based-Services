@@ -1,0 +1,52 @@
+<view class="page index-page">
+  <map
+    id="heritageMap"
+    class="map"
+    latitude="{{center.lat}}"
+    longitude="{{center.lng}}"
+    scale="{{scale}}"
+    show-location
+    markers="{{markers}}"
+    bindmarkertap="onMarkerTap"
+    bindregionchange="onRegionChange"
+  />
+
+  <view class="panel">
+    <view class="search-row">
+      <input class="search-input" placeholder="按名称搜索，如 三塔、故宫" value="{{filters.name}}" bindinput="onNameInput" confirm-type="search" bindconfirm="loadPois" />
+      <button class="search-btn primary" bindtap="loadPois">搜索</button>
+    </view>
+
+    <view class="filter-grid">
+      <picker mode="selector" range="{{provinces}}" bindchange="onProvinceChange">
+        <view class="filter-chip">{{filters.province || '全部省份'}}</view>
+      </picker>
+      <picker mode="selector" range="{{categories}}" bindchange="onCategoryChange">
+        <view class="filter-chip">{{filters.category || '全部类别'}}</view>
+      </picker>
+      <view class="filter-chip switch-chip">
+        <text>扩展信息</text>
+        <switch checked="{{filters.hasExt}}" color="#14532d" bindchange="onExtChange" />
+      </view>
+    </view>
+
+    <view class="button-row action-row">
+      <button class="ghost" bindtap="locateMe">定位</button>
+      <button class="ghost" bindtap="loadByMapBounds">当前视野</button>
+      <button class="ghost" bindtap="loadNearby">周边 10km</button>
+      <button class="ghost" bindtap="clearFilters">重置</button>
+    </view>
+
+    <view class="summary">
+      <text>{{loading ? '正在加载...' : ('共 ' + pagination.total + ' 条，显示 ' + pois.length + ' 条')}}</text>
+    </view>
+
+    <scroll-view class="poi-list" scroll-y>
+      <view wx:for="{{pois}}" wx:key="id" class="poi-item" data-id="{{item.id}}" bindtap="openDetail">
+        <view class="poi-title">{{item.name}}</view>
+        <view class="poi-meta">{{item.province}} · {{item.type}} · {{item.batch}}</view>
+        <view class="poi-address">{{item.address}}</view>
+      </view>
+    </scroll-view>
+  </view>
+</view>

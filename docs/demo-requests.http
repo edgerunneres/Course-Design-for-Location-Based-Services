@@ -1,0 +1,19 @@
+### Health
+GET http://127.0.0.1:3000/api/v1/health
+
+### Public query by name
+GET http://127.0.0.1:3000/api/v1/pois?name=三塔&pageSize=5
+X-API-Key: demo-public-key
+
+### Public query by bbox
+GET http://127.0.0.1:3000/api/v1/pois?bbox=100,25,101,26&pageSize=20
+X-API-Key: demo-public-key
+
+### Login maintainer
+POST http://127.0.0.1:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "Admin@123456"
+}

@@ -1,0 +1,39 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/detail/detail",
+    "pages/me/me",
+    "pages/admin/admin"
+  ],
+  "window": {
+    "navigationBarTitleText": "文保单位 LBS",
+    "navigationBarBackgroundColor": "#14532d",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f6f7f3"
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于在地图上持续显示当前位置，并进行周边文保单位半径查询"
+    }
+  },
+  "tabBar": {
+    "color": "#55605a",
+    "selectedColor": "#14532d",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "地图"
+      },
+      {
+        "pagePath": "pages/me/me",
+        "text": "我的"
+      },
+      {
+        "pagePath": "pages/admin/admin",
+        "text": "维护"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json"
+}
