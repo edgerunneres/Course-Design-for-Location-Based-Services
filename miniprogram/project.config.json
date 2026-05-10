@@ -1,6 +1,6 @@
 {
   "appid": "touristappid",
-  "projectname": "heritage-lbs-miniprogram",
+  "projectname": "course-design-yu-peilin",
   "description": "全国重点文物保护单位 LBS 课程设计微信小程序",
   "miniprogramRoot": "./",
   "compileType": "miniprogram",

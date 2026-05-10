@@ -1,0 +1,319 @@
+openapi: 3.0.3
+info:
+  title: 全国重点文保单位 POI Web API
+  version: 1.0.0
+  description: |
+    基于位置的服务课程设计专题 POI API。支持公众 APIKEY 查询、维护人员 CRUD、空间范围查询、中心半径查询和统一错误响应。
+servers:
+  - url: http://127.0.0.1:3000/api/v1
+    description: 本地开发
+  - url: https://example.com/api/v1
+    description: HTTPS 部署后替换为真实域名
+security:
+  - ApiKeyAuth: []
+paths:
+  /health:
+    get:
+      summary: 服务健康检查
+      security: []
+      responses:
+        "200":
+          description: 服务正常
+  /docs:
+    get:
+      summary: API 摘要
+      security: []
+      responses:
+        "200":
+          description: API 文档摘要
+  /auth/register:
+    post:
+      summary: 注册公众用户并获取 APIKEY
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: 注册成功
+        "409":
+          $ref: "#/components/responses/Error"
+  /auth/login:
+    post:
+      summary: 用户登录并获取 Bearer Token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: 登录成功
+        "401":
+          $ref: "#/components/responses/Error"
+  /users/me:
+    get:
+      summary: 查询当前用户资料
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: 当前用户
+    patch:
+      summary: 维护个人信息
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserPatch"
+      responses:
+        "200":
+          description: 修改成功
+  /apikey/rotate:
+    post:
+      summary: 重新生成 APIKEY
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: 生成成功
+  /categories:
+    get:
+      summary: 查询 POI 类别
+      responses:
+        "200":
+          description: 类别列表
+  /provinces:
+    get:
+      summary: 查询省份列表
+      responses:
+        "200":
+          description: 省份列表
+  /stats:
+    get:
+      summary: 查询数据统计
+      responses:
+        "200":
+          description: 统计结果
+  /pois:
+    get:
+      summary: 批量查询 POI
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: 名称模糊查询
+        - name: province
+          in: query
+          schema:
+            type: string
+          description: 省份
+        - name: category
+          in: query
+          schema:
+            type: string
+          description: 类别
+        - name: batch
+          in: query
+          schema:
+            type: string
+          description: 批次
+        - name: bbox
+          in: query
+          schema:
+            type: string
+            example: "100,25,101,26"
+          description: 地图框选范围，格式 minLng,minLat,maxLng,maxLat
+        - name: center
+          in: query
+          schema:
+            type: string
+            example: "116.397,39.908"
+          description: 中心点，格式 lng,lat
+        - name: radius
+          in: query
+          schema:
+            type: integer
+            example: 10000
+          description: 半径，单位米
+        - name: has_ext
+          in: query
+          schema:
+            type: boolean
+          description: 是否包含扩展信息
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        "200":
+          description: POI 分页结果
+        "401":
+          $ref: "#/components/responses/Error"
+    post:
+      summary: 新增 POI
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PoiWrite"
+      responses:
+        "201":
+          description: 新增成功
+        "403":
+          $ref: "#/components/responses/Error"
+  /pois/{id}:
+    get:
+      summary: 查询 POI 详情
+      parameters:
+        - $ref: "#/components/parameters/PoiId"
+      responses:
+        "200":
+          description: POI 详情
+        "404":
+          $ref: "#/components/responses/Error"
+    patch:
+      summary: 修改 POI
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PoiId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PoiWrite"
+      responses:
+        "200":
+          description: 修改成功
+    delete:
+      summary: 删除 POI
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PoiId"
+      responses:
+        "200":
+          description: 删除成功
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: HMAC token
+  parameters:
+    PoiId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      example: wh-0001
+  responses:
+    Error:
+      description: 统一错误响应
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        nickname:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          example: demo
+        password:
+          type: string
+          example: Demo@123456
+    UserPatch:
+      type: object
+      properties:
+        nickname:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+    PoiWrite:
+      type: object
+      required: [name, lng, lat]
+      properties:
+        name:
+          type: string
+        province:
+          type: string
+        type:
+          type: string
+        address:
+          type: string
+        age:
+          type: string
+        batch:
+          type: string
+        remark:
+          type: string
+        lng:
+          type: number
+        lat:
+          type: number
+        website:
+          type: string
+        imageUrl:
+          type: string
+    ErrorEnvelope:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            httpStatus:
+              type: integer
+            businessCode:
+              type: string
+            message:
+              type: string
+            debug:
+              type: object

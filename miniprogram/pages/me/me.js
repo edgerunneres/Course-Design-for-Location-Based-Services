@@ -6,6 +6,7 @@ Page({
     apiBase: "",
     apiKey: "",
     user: null,
+    userInitial: "用",
     register: { username: "", password: "", nickname: "" },
     login: { username: "demo", password: "Demo@123456" }
   },
@@ -14,8 +15,14 @@ Page({
     this.setData({
       apiBase: app.globalData.apiBase,
       apiKey: app.globalData.apiKey,
-      user: app.globalData.user
+      user: app.globalData.user,
+      userInitial: this.getInitial(app.globalData.user)
     });
+  },
+
+  getInitial(user) {
+    if (!user || !user.nickname) return "用";
+    return String(user.nickname).slice(0, 1);
   },
 
   onApiBaseInput(e) { this.setData({ apiBase: e.detail.value }); },
@@ -31,6 +38,10 @@ Page({
     wx.showToast({ title: "已保存", icon: "success" });
   },
 
+  copyApiKey() {
+    wx.setClipboardData({ data: this.data.apiKey || "" });
+  },
+
   async registerUser() {
     try {
       api.saveAuth({ apiBase: this.data.apiBase });
@@ -39,7 +50,7 @@ Page({
         data: this.data.register
       });
       api.saveAuth({ apiKey: data.apiKey, user: data.user });
-      this.setData({ apiKey: data.apiKey, user: data.user });
+      this.setData({ apiKey: data.apiKey, user: data.user, userInitial: this.getInitial(data.user) });
       wx.showToast({ title: "注册成功", icon: "success" });
     } catch (error) {
       wx.showToast({ title: error.message, icon: "none" });
@@ -54,7 +65,7 @@ Page({
         data: this.data.login
       });
       api.saveAuth({ token: data.token, apiKey: data.apiKey, user: data.user });
-      this.setData({ apiKey: data.apiKey, user: data.user });
+      this.setData({ apiKey: data.apiKey, user: data.user, userInitial: this.getInitial(data.user) });
       wx.showToast({ title: "登录成功", icon: "success" });
     } catch (error) {
       wx.showToast({ title: error.message, icon: "none" });
@@ -65,7 +76,7 @@ Page({
     try {
       const data = await api.request("/apikey/rotate", { method: "POST" });
       api.saveAuth({ apiKey: data.user.apiKey, user: data.user });
-      this.setData({ apiKey: data.user.apiKey, user: data.user });
+      this.setData({ apiKey: data.user.apiKey, user: data.user, userInitial: this.getInitial(data.user) });
       wx.showToast({ title: "已更新 APIKEY", icon: "success" });
     } catch (error) {
       wx.showToast({ title: error.message, icon: "none" });

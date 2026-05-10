@@ -8,34 +8,41 @@
     show-location
   />
 
-  <view class="detail-body">
-    <view class="title">{{item.name}}</view>
+  <view class="place-card surface">
+    <view class="place-kicker">{{item.province}} · {{item.batch}}</view>
+    <view class="place-title">{{item.name}}</view>
     <view class="tag-row">
-      <text class="tag">{{item.province}}</text>
-      <text class="tag">{{item.type}}</text>
-      <text class="tag">{{item.batch}}</text>
+      <text class="tag strong">{{item.type}}</text>
+      <text class="tag">{{item.age || '时代待考'}}</text>
+      <text class="tag" wx:if="{{item.hasExt}}">含扩展资料</text>
     </view>
 
-    <view class="field">
-      <view class="label">时代</view>
-      <view class="value">{{item.age || '暂无'}}</view>
-    </view>
-    <view class="field">
-      <view class="label">地址</view>
-      <view class="value">{{item.address}}</view>
-    </view>
-    <view class="field">
-      <view class="label">备注</view>
-      <view class="value">{{item.remark || '暂无扩展备注'}}</view>
-    </view>
-    <view class="field">
-      <view class="label">坐标</view>
-      <view class="value">GCJ-02: {{item.gcjLng}}, {{item.gcjLat}}</view>
-    </view>
-
-    <view class="button-row">
+    <view class="action-grid">
+      <button class="primary" bindtap="openLocation">地图导航</button>
       <button class="ghost" bindtap="copyJson">复制 JSON</button>
-      <button wx:if="{{item.website}}" class="primary" bindtap="copyWebsite">复制资料链接</button>
+      <button wx:if="{{item.website}}" class="secondary" bindtap="copyWebsite">资料链接</button>
+    </view>
+  </view>
+
+  <view class="detail-body">
+    <view class="section-title">基础信息</view>
+    <view class="info-grid">
+      <view class="field">
+        <view class="label">地址</view>
+        <view class="value">{{item.address}}</view>
+      </view>
+      <view class="field">
+        <view class="label">备注</view>
+        <view class="value">{{item.remark || '暂无扩展备注'}}</view>
+      </view>
+      <view class="field">
+        <view class="label">服务坐标</view>
+        <view class="value">GCJ-02 {{item.gcjLng}}, {{item.gcjLat}}</view>
+      </view>
+      <view class="field">
+        <view class="label">原始编号</view>
+        <view class="value">{{item.code}} / {{item.classCode}}</view>
+      </view>
     </view>
   </view>
 </view>

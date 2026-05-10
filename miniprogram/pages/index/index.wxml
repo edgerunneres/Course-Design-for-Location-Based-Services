@@ -11,42 +11,63 @@
     bindregionchange="onRegionChange"
   />
 
-  <view class="panel">
-    <view class="search-row">
-      <input class="search-input" placeholder="按名称搜索，如 三塔、故宫" value="{{filters.name}}" bindinput="onNameInput" confirm-type="search" bindconfirm="loadPois" />
-      <button class="search-btn primary" bindtap="loadPois">搜索</button>
+  <view class="search-console surface">
+    <view class="brand-row">
+      <view>
+        <view class="eyebrow">National Heritage POI</view>
+        <view class="brand-title">全国重点文保单位</view>
+      </view>
+      <view class="count-pill">{{pagination.total || 0}} 条</view>
     </view>
 
-    <view class="filter-grid">
+    <view class="search-row">
+      <input class="search-input" placeholder="搜索名称，如 故宫、三塔、遗址" value="{{filters.name}}" bindinput="onNameInput" confirm-type="search" bindconfirm="loadPois" />
+      <button class="search-btn primary" bindtap="loadPois">查找</button>
+    </view>
+
+    <view class="quick-row">
+      <view class="quick-chip {{lastMode === 'bounds' ? 'active' : ''}}" bindtap="loadByMapBounds">当前视野</view>
+      <view class="quick-chip {{lastMode === 'nearby' ? 'active' : ''}}" bindtap="loadNearby">周边 10km</view>
+      <view class="quick-chip" bindtap="locateMe">定位</view>
+      <view class="quick-chip muted" bindtap="clearFilters">重置</view>
+    </view>
+
+    <view class="filter-row">
       <picker mode="selector" range="{{provinces}}" bindchange="onProvinceChange">
-        <view class="filter-chip">{{filters.province || '全部省份'}}</view>
+        <view class="filter-control">{{filters.province || '全部省份'}}</view>
       </picker>
       <picker mode="selector" range="{{categories}}" bindchange="onCategoryChange">
-        <view class="filter-chip">{{filters.category || '全部类别'}}</view>
+        <view class="filter-control">{{filters.category || '全部类别'}}</view>
       </picker>
-      <view class="filter-chip switch-chip">
-        <text>扩展信息</text>
-        <switch checked="{{filters.hasExt}}" color="#14532d" bindchange="onExtChange" />
+      <view class="filter-control ext-control" bindtap="toggleExt">
+        <text>{{filters.hasExt ? '含扩展信息' : '不限扩展'}}</text>
       </view>
     </view>
+  </view>
 
-    <view class="button-row action-row">
-      <button class="ghost" bindtap="locateMe">定位</button>
-      <button class="ghost" bindtap="loadByMapBounds">当前视野</button>
-      <button class="ghost" bindtap="loadNearby">周边 10km</button>
-      <button class="ghost" bindtap="clearFilters">重置</button>
+  <view class="result-sheet">
+    <view class="sheet-handle"></view>
+    <view class="sheet-head">
+      <view>
+        <view class="sheet-title">{{loading ? '正在加载' : resultTitle}}</view>
+        <view class="sheet-subtitle">{{resultSubtitle}}</view>
+      </view>
+      <button class="small-btn ghost" bindtap="loadPois">刷新</button>
     </view>
 
-    <view class="summary">
-      <text>{{loading ? '正在加载...' : ('共 ' + pagination.total + ' 条，显示 ' + pois.length + ' 条')}}</text>
-    </view>
-
-    <scroll-view class="poi-list" scroll-y>
+    <scroll-view class="poi-list" scroll-y enhanced show-scrollbar="{{false}}">
       <view wx:for="{{pois}}" wx:key="id" class="poi-item" data-id="{{item.id}}" bindtap="openDetail">
-        <view class="poi-title">{{item.name}}</view>
-        <view class="poi-meta">{{item.province}} · {{item.type}} · {{item.batch}}</view>
-        <view class="poi-address">{{item.address}}</view>
+        <view class="poi-main">
+          <view class="poi-title">{{item.name}}</view>
+          <view class="poi-meta">{{item.province}} · {{item.type}} · {{item.batch}}</view>
+          <view class="poi-address">{{item.address}}</view>
+        </view>
+        <view class="poi-side">
+          <view wx:if="{{item.distance}}" class="distance">{{item.distance}}m</view>
+          <view wx:if="{{item.hasExt}}" class="ext-dot">资料</view>
+        </view>
       </view>
+      <view wx:if="{{!loading && pois.length === 0}}" class="empty">当前条件下没有结果，请调整关键词或地图范围。</view>
     </scroll-view>
   </view>
 </view>

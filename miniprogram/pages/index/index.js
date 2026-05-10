@@ -14,9 +14,12 @@ Page({
     },
     pois: [],
     markers: [],
-    pagination: { total: 0, page: 1, pageSize: 50 },
+    pagination: { total: 0, page: 1, pageSize: 80 },
     loading: false,
-    userLocation: null
+    userLocation: null,
+    lastMode: "normal",
+    resultTitle: "精选文保点",
+    resultSubtitle: "支持名称、省份、类别、视野范围和周边半径查询"
   },
 
   onLoad() {
@@ -45,7 +48,7 @@ Page({
     const filters = this.data.filters;
     const query = {
       page: 1,
-      pageSize: 50,
+      pageSize: 80,
       ...extra
     };
     if (filters.name) query.name = filters.name;
@@ -72,14 +75,19 @@ Page({
           content: item.name,
           display: "BYCLICK",
           padding: 8,
-          borderRadius: 4
+          borderRadius: 4,
+          bgColor: "#ffffff",
+          color: "#10231f"
         }
       }));
+      const subtitle = this.describeResult(data.pagination.total, data.items.length);
       this.setData({
         pois: data.items,
         pagination: data.pagination,
         markers,
-        loading: false
+        loading: false,
+        resultTitle: this.getResultTitle(extra),
+        resultSubtitle: subtitle
       });
       if (data.items[0]) {
         this.setData({
@@ -94,6 +102,24 @@ Page({
       this.setData({ loading: false });
       this.toast(error.message);
     }
+  },
+
+  getResultTitle(extra = {}) {
+    if (extra.center) return "周边文保单位";
+    if (extra.bbox) return "当前视野结果";
+    if (this.data.filters.name) return `搜索：${this.data.filters.name}`;
+    if (this.data.filters.province || this.data.filters.category || this.data.filters.hasExt) return "筛选结果";
+    return "精选文保点";
+  },
+
+  describeResult(total, shown) {
+    const filters = this.data.filters;
+    const chips = [];
+    if (filters.province) chips.push(filters.province);
+    if (filters.category) chips.push(filters.category);
+    if (filters.hasExt) chips.push("含扩展信息");
+    const suffix = chips.length ? ` · ${chips.join(" · ")}` : "";
+    return `共 ${total} 条，当前显示 ${shown} 条${suffix}`;
   },
 
   locateMe(showToast = true) {
@@ -116,6 +142,7 @@ Page({
       this.locateMe();
       return;
     }
+    this.setData({ lastMode: "nearby" });
     this.loadPois({
       center: `${userLocation.lng},${userLocation.lat}`,
       radius: 10000
@@ -127,6 +154,7 @@ Page({
       success: (res) => {
         const sw = res.southwest;
         const ne = res.northeast;
+        this.setData({ lastMode: "bounds" });
         this.loadPois({
           bbox: `${sw.longitude},${sw.latitude},${ne.longitude},${ne.latitude}`
         });
@@ -147,24 +175,35 @@ Page({
 
   onProvinceChange(event) {
     const value = this.data.provinces[event.detail.value];
-    this.setData({ "filters.province": value === "全部省份" ? "" : value });
+    this.setData({
+      "filters.province": value === "全部省份" ? "" : value,
+      lastMode: "normal"
+    });
     this.loadPois();
   },
 
   onCategoryChange(event) {
     const value = this.data.categories[event.detail.value];
-    this.setData({ "filters.category": value === "全部类别" ? "" : value });
+    this.setData({
+      "filters.category": value === "全部类别" ? "" : value,
+      lastMode: "normal"
+    });
     this.loadPois();
   },
 
-  onExtChange(event) {
-    this.setData({ "filters.hasExt": event.detail.value });
+  toggleExt() {
+    this.setData({
+      "filters.hasExt": !this.data.filters.hasExt,
+      lastMode: "normal"
+    });
     this.loadPois();
   },
 
   clearFilters() {
     this.setData({
-      filters: { name: "", province: "", category: "", hasExt: false }
+      filters: { name: "", province: "", category: "", hasExt: false },
+      lastMode: "normal",
+      scale: 5
     });
     this.loadPois();
   },

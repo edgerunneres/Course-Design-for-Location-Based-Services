@@ -1,59 +1,73 @@
 .admin-page {
   padding: 24rpx;
+  background: #f4f1e8;
+}
+
+.admin-hero {
+  padding: 26rpx 4rpx 24rpx;
+}
+
+.hero-title {
+  font-size: 42rpx;
+  font-weight: 900;
+  color: #10231f;
+}
+
+.hero-subtitle {
+  margin-top: 10rpx;
+  color: #68736d;
+  font-size: 25rpx;
+  line-height: 1.45;
 }
 
 .section {
-  background: #ffffff;
-  border: 1px solid #dfe5dd;
-  border-radius: 8rpx;
-  padding: 22rpx;
+  padding: 24rpx;
   margin-bottom: 22rpx;
 }
 
 .section-title {
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #153d28;
-  margin-bottom: 18rpx;
-}
-
-.input {
-  min-height: 72rpx;
-  font-size: 27rpx;
-}
-
-.standalone {
-  border: 1px solid #d9e1d7;
-  border-radius: 8rpx;
-  padding: 0 18rpx;
+  font-size: 31rpx;
+  font-weight: 900;
+  color: #10231f;
   margin-bottom: 16rpx;
-  background: #fff;
+}
+
+.section-desc {
+  color: #68736d;
+  font-size: 23rpx;
+  line-height: 1.4;
+  margin-bottom: 16rpx;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14rpx;
 }
 
 .textarea {
   width: 100%;
-  min-height: 150rpx;
-  border: 1px solid #d9e1d7;
-  border-radius: 8rpx;
+  min-height: 160rpx;
+  border: 1px solid #ded8c9;
+  border-radius: 12rpx;
   padding: 18rpx;
   box-sizing: border-box;
   margin-bottom: 16rpx;
+  background: #fff;
 }
 
 .full {
   width: 100%;
   height: 74rpx;
   line-height: 74rpx;
-  border-radius: 8rpx;
   font-size: 27rpx;
-  margin: 0;
+  font-weight: 700;
 }
 
 .action {
-  min-width: 220rpx;
-  height: 72rpx;
-  line-height: 72rpx;
-  border-radius: 8rpx;
+  flex: 1;
+  height: 74rpx;
+  line-height: 74rpx;
   font-size: 27rpx;
-  margin: 0;
+  font-weight: 700;
 }

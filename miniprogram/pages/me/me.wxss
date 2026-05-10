@@ -1,46 +1,102 @@
-.me-page {
+.account-page {
   padding: 24rpx;
+  background: #f4f1e8;
+}
+
+.account-hero {
+  padding: 26rpx 4rpx 24rpx;
+}
+
+.hero-title {
+  font-size: 42rpx;
+  font-weight: 900;
+  color: #10231f;
+}
+
+.hero-subtitle {
+  margin-top: 10rpx;
+  color: #68736d;
+  font-size: 25rpx;
+  line-height: 1.45;
 }
 
 .section {
-  background: #ffffff;
-  border: 1px solid #dfe5dd;
-  border-radius: 8rpx;
-  padding: 22rpx;
+  padding: 24rpx;
   margin-bottom: 22rpx;
 }
 
+.section-head {
+  display: flex;
+  justify-content: space-between;
+}
+
 .section-title {
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #153d28;
+  font-size: 31rpx;
+  font-weight: 900;
+  color: #10231f;
+  margin-bottom: 10rpx;
+}
+
+.section-desc {
+  color: #68736d;
+  font-size: 23rpx;
+  line-height: 1.4;
   margin-bottom: 18rpx;
 }
 
-.input {
-  min-height: 72rpx;
-  font-size: 27rpx;
+.wide {
+  flex: 1;
+  height: 72rpx;
+  line-height: 72rpx;
+  font-size: 26rpx;
+  font-weight: 700;
 }
 
-.standalone {
-  border: 1px solid #d9e1d7;
-  border-radius: 8rpx;
-  padding: 0 18rpx;
-  margin-bottom: 16rpx;
-  background: #fff;
+.compact {
+  width: 154rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  font-size: 25rpx;
 }
 
 .full {
   width: 100%;
   height: 74rpx;
   line-height: 74rpx;
-  border-radius: 8rpx;
   font-size: 27rpx;
-  margin: 0;
+  font-weight: 700;
 }
 
-.profile-line {
-  font-size: 28rpx;
-  line-height: 1.7;
-  color: #2f3a33;
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  padding: 18rpx;
+  background: #fbfaf5;
+  border: 1px solid #e5dfd0;
+  border-radius: 12rpx;
+  margin: 16rpx 0;
+}
+
+.avatar {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 999rpx;
+  line-height: 72rpx;
+  text-align: center;
+  background: #10231f;
+  color: #fff;
+  font-weight: 900;
+}
+
+.profile-name {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #10231f;
+}
+
+.profile-meta {
+  margin-top: 6rpx;
+  color: #68736d;
+  font-size: 23rpx;
 }

@@ -7,9 +7,9 @@
   ],
   "window": {
     "navigationBarTitleText": "文保单位 LBS",
-    "navigationBarBackgroundColor": "#14532d",
+    "navigationBarBackgroundColor": "#10231f",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#f6f7f3"
+    "backgroundColor": "#f4f1e8"
   },
   "permission": {
     "scope.userLocation": {
@@ -17,9 +17,10 @@
     }
   },
   "tabBar": {
-    "color": "#55605a",
-    "selectedColor": "#14532d",
+    "color": "#5d655f",
+    "selectedColor": "#10231f",
     "backgroundColor": "#ffffff",
+    "borderStyle": "black",
     "list": [
       {
         "pagePath": "pages/index/index",
@@ -27,7 +28,7 @@
       },
       {
         "pagePath": "pages/me/me",
-        "text": "我的"
+        "text": "账户"
       },
       {
         "pagePath": "pages/admin/admin",

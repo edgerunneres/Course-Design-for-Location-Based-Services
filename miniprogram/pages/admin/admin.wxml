@@ -1,20 +1,32 @@
 <view class="page admin-page">
-  <view class="section">
+  <view class="admin-hero">
+    <view class="hero-title">POI 数据维护</view>
+    <view class="hero-subtitle">维护人员角色可执行单项新增、修改和删除操作。</view>
+  </view>
+
+  <view class="section surface">
     <view class="section-title">维护人员登录</view>
-    <input class="input standalone" placeholder="用户名" value="{{login.username}}" bindinput="onUsername" />
-    <input class="input standalone" password placeholder="密码" value="{{login.password}}" bindinput="onPassword" />
+    <view class="form-grid">
+      <input class="input standalone" placeholder="用户名" value="{{login.username}}" bindinput="onUsername" />
+      <input class="input standalone" password placeholder="密码" value="{{login.password}}" bindinput="onPassword" />
+    </view>
     <button class="primary full" bindtap="loginMaintainer">登录维护角色</button>
   </view>
 
-  <view class="section">
+  <view class="section surface">
     <view class="section-title">POI 新增 / 修改</view>
-    <input class="input standalone" placeholder="修改时填写 POI ID，新增可留空" value="{{form.id}}" bindinput="onId" />
+    <view class="section-desc">修改时填写已有 POI ID；新增时留空，由服务端自动生成。</view>
+    <input class="input standalone" placeholder="POI ID" value="{{form.id}}" bindinput="onId" />
     <input class="input standalone" placeholder="名称" value="{{form.name}}" bindinput="onName" />
-    <input class="input standalone" placeholder="省份，如 北京市" value="{{form.province}}" bindinput="onProvince" />
-    <input class="input standalone" placeholder="类别，如 古建筑" value="{{form.type}}" bindinput="onType" />
+    <view class="form-grid">
+      <input class="input standalone" placeholder="省份，如 北京市" value="{{form.province}}" bindinput="onProvince" />
+      <input class="input standalone" placeholder="类别，如 古建筑" value="{{form.type}}" bindinput="onType" />
+    </view>
     <input class="input standalone" placeholder="地址" value="{{form.address}}" bindinput="onAddress" />
-    <input class="input standalone" placeholder="经度" value="{{form.lng}}" bindinput="onLng" />
-    <input class="input standalone" placeholder="纬度" value="{{form.lat}}" bindinput="onLat" />
+    <view class="form-grid">
+      <input class="input standalone" placeholder="经度" value="{{form.lng}}" bindinput="onLng" />
+      <input class="input standalone" placeholder="纬度" value="{{form.lat}}" bindinput="onLat" />
+    </view>
     <textarea class="textarea" placeholder="备注/扩展信息" value="{{form.remark}}" bindinput="onRemark" />
     <view class="button-row">
       <button class="primary action" bindtap="savePoi">{{form.id ? '修改' : '新增'}}</button>
