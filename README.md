@@ -84,11 +84,9 @@ node --test server/tests/*.test.js
 1. 用微信开发者工具导入 `heritage-lbs/miniprogram`。
 2. AppID 可先选择测试号；本地调试时在详情中勾选“不校验合法域名、web-view、TLS 版本以及 HTTPS 证书”。
 3. 先启动后端，再运行小程序。默认 API 地址为 `http://127.0.0.1:3000/api/v1`。
-4. 真机或正式提交前，需要把后端部署到 HTTPS 域名，在“账户”页修改 API 地址，并在微信公众平台配置 request 合法域名。
+4. 真机运行前，需要把后端部署到 HTTPS 域名，在“账户”页修改 API 地址，并在微信公众平台配置 request 合法域名。
 
 ## Apifox / Apipost
-
-老师推荐的 Apifox、Apipost 对本项目有用，建议作为 API 调试和答辩证明材料使用：
 
 - 导入文件：`docs/openapi.yaml`
 - 本地环境：`baseUrl=http://127.0.0.1:3000/api/v1`
