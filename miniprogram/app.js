@@ -1,7 +1,9 @@
+const config = require("./config");
+
 App({
   globalData: {
-    apiBase: "http://127.0.0.1:3000/api/v1",
-    apiKey: "demo-public-key",
+    apiBase: config.API_BASE,
+    apiKey: config.DEMO_API_KEY,
     token: "",
     user: null
   },

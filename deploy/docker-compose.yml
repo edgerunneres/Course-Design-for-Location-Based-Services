@@ -1,0 +1,44 @@
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: server/Dockerfile
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      HOST: 0.0.0.0
+      LBS_DB_PATH: /data/db.json
+      LBS_FORCE_HTTPS: "true"
+      LBS_TOKEN_SECRET: ${LBS_TOKEN_SECRET}
+      LBS_ADMIN_PASSWORD: ${LBS_ADMIN_PASSWORD}
+      LBS_PUBLIC_RATE_LIMIT: ${LBS_PUBLIC_RATE_LIMIT:-120}
+    volumes:
+      - lbs_api_data:/data
+    networks:
+      - lbs_net
+
+  caddy:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      API_DOMAIN: ${API_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - lbs_net
+
+volumes:
+  lbs_api_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  lbs_net:

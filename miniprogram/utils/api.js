@@ -1,12 +1,13 @@
 const app = getApp();
+const config = require("../config");
 
 function getBase() {
-  return app.globalData.apiBase || "http://127.0.0.1:3000/api/v1";
+  return app.globalData.apiBase || config.API_BASE;
 }
 
 function getHeaders(extra = {}) {
   const headers = {
-    "X-API-Key": app.globalData.apiKey || "demo-public-key",
+    "X-API-Key": app.globalData.apiKey || config.DEMO_API_KEY,
     ...extra
   };
   if (app.globalData.token) {

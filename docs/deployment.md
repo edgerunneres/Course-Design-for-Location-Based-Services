@@ -14,7 +14,29 @@
 | `LBS_HTTPS_CERT` | 证书路径 | Node 直接启 HTTPS 时使用 |
 | `LBS_HTTPS_KEY` | 私钥路径 | Node 直接启 HTTPS 时使用 |
 
-## 推荐部署流程
+## 推荐部署流程：Docker + Caddy
+
+项目已提供可直接使用的部署目录 `deploy/`。Caddy 会自动申请 HTTPS 证书，并把请求转发到 Node API 服务。
+
+```bash
+git clone https://gitee.com/lbs-252602/course-design---yu-peilin.git
+cd course-design---yu-peilin/deploy
+cp .env.example .env
+```
+
+编辑 `.env` 后启动：
+
+```bash
+docker compose up -d --build
+```
+
+验证：
+
+```bash
+curl https://你的API域名/api/v1/health
+```
+
+## 传统部署流程
 
 1. 将 `heritage-lbs` 上传到服务器或 Gitee 仓库。
 2. 在服务器安装 Node.js 18+。

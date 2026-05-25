@@ -97,12 +97,14 @@ node --test server/tests/*.test.js
 
 ## HTTPS 部署
 
-后端支持两种方式：
+后端已提供 Docker + Caddy 生产部署配置：
 
-- 推荐：Nginx/Caddy 反向代理负责 HTTPS，Node 服务监听内网 HTTP，同时设置 `LBS_FORCE_HTTPS=true` 并转发 `X-Forwarded-Proto=https`。
-- 直接 Node HTTPS：设置 `LBS_HTTPS_CERT=/path/fullchain.pem` 与 `LBS_HTTPS_KEY=/path/privkey.pem`。
+- `server/Dockerfile`
+- `deploy/docker-compose.yml`
+- `deploy/Caddyfile`
+- `deploy/.env.example`
 
-详见 `docs/deployment.md`。
+部署后把 `miniprogram/config.js` 中的 `API_BASE` 改为正式 HTTPS API 地址，并在微信公众平台配置 request 合法域名。详见 `deploy/README.md` 与 `docs/mini-program-release.md`。
 
 ## 典型接口
 

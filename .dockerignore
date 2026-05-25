@@ -1,0 +1,7 @@
+.git
+node_modules
+server/data/db.json
+*.log
+deploy/.env
+miniprogram
+docs
