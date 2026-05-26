@@ -86,6 +86,14 @@ node --test server/tests/*.test.js
 3. 先启动后端，再运行小程序。默认 API 地址为 `http://127.0.0.1:3000/api/v1`。
 4. 真机运行前，需要把后端部署到 HTTPS 域名，在“账户”页修改 API 地址，并在微信公众平台配置 request 合法域名。
 
+如果只想用自己的手机测试，不正式发布，可执行：
+
+```powershell
+.\scripts\start-phone-test.ps1
+```
+
+详见 `docs/phone-test-lan.md`。
+
 ## Apifox / Apipost
 
 - 导入文件：`docs/openapi.yaml`
