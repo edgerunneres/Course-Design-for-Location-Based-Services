@@ -91,3 +91,10 @@
 | 409 | `USERNAME_EXISTS` | 用户名已存在 |
 | 429 | `RATE_LIMITED` | 公众 APIKEY 访问超过限速 |
 | 500 | `INTERNAL_ERROR` | 服务端异常 |
+
+## 性能与鲁棒性说明
+
+- `GET /pois` 等较大的 JSON 响应支持 gzip。客户端请求头包含 `Accept-Encoding: gzip` 时，服务端返回 `Content-Encoding: gzip`。
+- `db.json` 采用临时文件写入后原子重命名的方式保存，避免直接覆盖写入导致的数据损坏。
+- 公众访问限速器会定时清理过期桶，并在桶数量异常膨胀时淘汰最久未使用记录，避免长期运行内存持续增长。
+- 半径检索当前使用 Haversine 球面距离。课程规模下足够稳定；若进入真实生产环境，建议迁移至 PostGIS 或 WGS84 椭球体距离计算模型。

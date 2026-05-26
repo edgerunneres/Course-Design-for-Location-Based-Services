@@ -2,9 +2,11 @@
 
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
+const http = require("node:http");
 const os = require("node:os");
 const path = require("node:path");
 const test = require("node:test");
+const zlib = require("node:zlib");
 const { createApp } = require("../server");
 
 function listen(server) {
@@ -22,6 +24,24 @@ async function request(base, route, options = {}) {
     }
   });
   return { status: res.status, body: await res.json() };
+}
+
+function rawRequest(port, route, headers = {}) {
+  return new Promise((resolve, reject) => {
+    const req = http.request({
+      hostname: "127.0.0.1",
+      port,
+      path: route,
+      method: "GET",
+      headers
+    }, (res) => {
+      const chunks = [];
+      res.on("data", (chunk) => chunks.push(chunk));
+      res.on("end", () => resolve({ status: res.statusCode, headers: res.headers, body: Buffer.concat(chunks) }));
+    });
+    req.on("error", reject);
+    req.end();
+  });
 }
 
 test("public API key can query and maintainer can create/update/delete POI", async () => {
@@ -81,6 +101,26 @@ test("public API key can query and maintainer can create/update/delete POI", asy
     });
     assert.equal(deleted.status, 200);
     assert.equal(deleted.body.data.deleted, true);
+  } finally {
+    await new Promise((resolve) => server.close(resolve));
+  }
+});
+
+test("large JSON responses are gzip-compressed when requested", async () => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), "lbs-api-gzip-"));
+  const server = createApp({ dbPath: path.join(temp, "db.json"), rateLimit: 1000 });
+  const port = await listen(server);
+
+  try {
+    const res = await rawRequest(port, "/api/v1/pois?pageSize=100", {
+      "X-API-Key": "demo-public-key",
+      "Accept-Encoding": "gzip"
+    });
+    assert.equal(res.status, 200);
+    assert.equal(res.headers["content-encoding"], "gzip");
+    const body = JSON.parse(zlib.gunzipSync(res.body).toString("utf8"));
+    assert.equal(body.success, true);
+    assert.equal(body.data.items.length, 100);
   } finally {
     await new Promise((resolve) => server.close(resolve));
   }

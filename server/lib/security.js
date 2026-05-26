@@ -61,10 +61,15 @@ function verifyToken(token, secret) {
 }
 
 class RateLimiter {
-  constructor({ limit = 120, windowMs = 60_000 } = {}) {
+  constructor({ limit = 120, windowMs = 60_000, cleanupMs = 5 * 60_000, maxBuckets = 10_000 } = {}) {
     this.limit = limit;
     this.windowMs = windowMs;
+    this.maxBuckets = maxBuckets;
     this.buckets = new Map();
+    this.cleanupInterval = setInterval(() => this.cleanup(), cleanupMs);
+    if (typeof this.cleanupInterval.unref === "function") {
+      this.cleanupInterval.unref();
+    }
   }
 
   check(key) {
@@ -72,15 +77,33 @@ class RateLimiter {
     const bucketKey = String(key || "anonymous");
     const current = this.buckets.get(bucketKey);
     if (!current || current.resetAt <= now) {
-      this.buckets.set(bucketKey, { count: 1, resetAt: now + this.windowMs });
+      this.buckets.set(bucketKey, { count: 1, resetAt: now + this.windowMs, lastSeen: now });
+      if (this.buckets.size > this.maxBuckets) this.cleanup(now);
       return { ok: true, remaining: this.limit - 1, resetAt: now + this.windowMs };
     }
     current.count += 1;
+    current.lastSeen = now;
     return {
       ok: current.count <= this.limit,
       remaining: Math.max(0, this.limit - current.count),
       resetAt: current.resetAt
     };
+  }
+
+  cleanup(now = Date.now()) {
+    for (const [key, bucket] of this.buckets) {
+      if (bucket.resetAt <= now) {
+        this.buckets.delete(key);
+      }
+    }
+    if (this.buckets.size <= this.maxBuckets) return;
+    const overflow = this.buckets.size - this.maxBuckets;
+    const oldest = [...this.buckets.entries()]
+      .sort((a, b) => a[1].lastSeen - b[1].lastSeen)
+      .slice(0, overflow);
+    for (const [key] of oldest) {
+      this.buckets.delete(key);
+    }
   }
 }
 

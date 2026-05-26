@@ -24,9 +24,20 @@ Page({
 
   onLoad() {
     this.mapContext = wx.createMapContext("heritageMap", this);
+    this.initMarkerCluster();
     this.loadMeta();
     this.loadPois();
     this.locateMe(false);
+  },
+
+  initMarkerCluster() {
+    if (!this.mapContext || typeof this.mapContext.initMarkerCluster !== "function") return;
+    this.mapContext.initMarkerCluster({
+      enableDefaultStyle: true,
+      zoomOnClick: true,
+      gridSize: 60,
+      complete: () => {}
+    });
   },
 
   async loadMeta() {
@@ -69,6 +80,7 @@ Page({
         poiId: item.id,
         latitude: item.gcjLat || item.lat,
         longitude: item.gcjLng || item.lng,
+        joinCluster: true,
         width: 28,
         height: 28,
         callout: {

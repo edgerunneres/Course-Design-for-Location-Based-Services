@@ -4,6 +4,7 @@ const fs = require("node:fs");
 const http = require("node:http");
 const https = require("node:https");
 const path = require("node:path");
+const zlib = require("node:zlib");
 const { URL } = require("node:url");
 const { DataStore, publicUser } = require("./lib/data-store");
 const { RateLimiter, signToken, verifyPassword, verifyToken } = require("./lib/security");
@@ -42,23 +43,40 @@ function makeEnvelope(ok, payload, requestId) {
   return payload;
 }
 
-function sendJson(res, status, body, headers = {}) {
-  res.writeHead(status, {
+function sendJson(req, res, status, body, headers = {}) {
+  const raw = JSON.stringify(body, null, 2);
+  const responseHeaders = {
     "Content-Type": "application/json; charset=utf-8",
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type, Authorization, X-API-Key",
     "Access-Control-Allow-Methods": "GET,POST,PATCH,PUT,DELETE,OPTIONS",
+    "Vary": "Accept-Encoding",
     ...headers
+  };
+  const acceptsGzip = /\bgzip\b/.test(String(req.headers["accept-encoding"] || ""));
+  if (acceptsGzip && raw.length >= 1024) {
+    const compressed = zlib.gzipSync(raw);
+    res.writeHead(status, {
+      ...responseHeaders,
+      "Content-Encoding": "gzip",
+      "Content-Length": compressed.length
+    });
+    res.end(compressed);
+    return;
+  }
+  res.writeHead(status, {
+    ...responseHeaders,
+    "Content-Length": Buffer.byteLength(raw)
   });
-  res.end(JSON.stringify(body, null, 2));
+  res.end(raw);
 }
 
-function success(res, requestId, data, status = 200, headers = {}) {
-  sendJson(res, status, makeEnvelope(true, data, requestId), headers);
+function success(req, res, requestId, data, status = 200, headers = {}) {
+  sendJson(req, res, status, makeEnvelope(true, data, requestId), headers);
 }
 
-function fail(res, requestId, status, businessCode, message, debug = {}) {
-  sendJson(res, status, {
+function fail(req, res, requestId, status, businessCode, message, debug = {}) {
+  sendJson(req, res, status, {
     success: false,
     error: {
       httpStatus: status,
@@ -135,7 +153,7 @@ function createApp(overrides = {}) {
     if (!config.forceHttps) return false;
     const proto = req.headers["x-forwarded-proto"];
     if (req.socket.encrypted || proto === "https") return false;
-    fail(res, requestId, 403, "HTTPS_REQUIRED", "服务端已启用强制 HTTPS 访问。", {
+    fail(req, res, requestId, 403, "HTTPS_REQUIRED", "服务端已启用强制 HTTPS 访问。", {
       resource: req.url
     });
     return true;
@@ -151,7 +169,7 @@ function createApp(overrides = {}) {
   function requireLogin(req, res, requestId) {
     const user = currentUser(req);
     if (!user) {
-      fail(res, requestId, 401, "AUTH_REQUIRED", "请先登录并在 Authorization 中携带 Bearer Token。");
+      fail(req, res, requestId, 401, "AUTH_REQUIRED", "请先登录并在 Authorization 中携带 Bearer Token。");
       return null;
     }
     return user;
@@ -161,7 +179,7 @@ function createApp(overrides = {}) {
     const user = requireLogin(req, res, requestId);
     if (!user) return null;
     if (!roles.includes(user.role)) {
-      fail(res, requestId, 403, "ROLE_FORBIDDEN", "当前角色无权访问该资源。", {
+      fail(req, res, requestId, 403, "ROLE_FORBIDDEN", "当前角色无权访问该资源。", {
         requiredRoles: roles,
         currentRole: user.role
       });
@@ -176,7 +194,7 @@ function createApp(overrides = {}) {
     const apiKey = getApiKey(req, url);
     const user = apiKey ? store.findUserByApiKey(apiKey) : null;
     if (!user) {
-      fail(res, requestId, 401, "APIKEY_REQUIRED", "公众查询需要先注册并携带有效 APIKEY。", {
+      fail(req, res, requestId, 401, "APIKEY_REQUIRED", "公众查询需要先注册并携带有效 APIKEY。", {
         header: "X-API-Key",
         query: "api_key"
       });
@@ -186,7 +204,7 @@ function createApp(overrides = {}) {
     res.setHeader("X-RateLimit-Limit", String(config.rateLimit));
     res.setHeader("X-RateLimit-Remaining", String(rate.remaining));
     if (!rate.ok) {
-      fail(res, requestId, 429, "RATE_LIMITED", "访问频率超过公众角色限制，请稍后再试。", {
+      fail(req, res, requestId, 429, "RATE_LIMITED", "访问频率超过公众角色限制，请稍后再试。", {
         resetAt: new Date(rate.resetAt).toISOString()
       });
       return null;
@@ -197,21 +215,21 @@ function createApp(overrides = {}) {
   async function handleRequest(req, res) {
     const requestId = `req_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
     if (req.method === "OPTIONS") {
-      return sendJson(res, 204, {});
+      return sendJson(req, res, 204, {});
     }
     if (requireHttps(req, res, requestId)) return;
 
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
     const segments = url.pathname.split("/").filter(Boolean);
     if (segments[0] !== "api" || segments[1] !== "v1") {
-      return fail(res, requestId, 404, "ROUTE_NOT_FOUND", "未找到接口路径。", {
+      return fail(req, res, requestId, 404, "ROUTE_NOT_FOUND", "未找到接口路径。", {
         resource: url.pathname
       });
     }
 
     try {
       if (req.method === "GET" && segments[2] === "health") {
-        return success(res, requestId, {
+        return success(req, res, requestId, {
           service: "heritage-poi-api",
           status: "ok",
           poiCount: store.data.pois.length,
@@ -220,7 +238,7 @@ function createApp(overrides = {}) {
       }
 
       if (req.method === "GET" && segments[2] === "docs") {
-        return success(res, requestId, {
+        return success(req, res, requestId, {
           title: "全国重点文物保护单位 POI REST API",
           auth: {
             publicQuery: "Header X-API-Key 或 query api_key",
@@ -255,20 +273,20 @@ function createApp(overrides = {}) {
       if (segments[2] === "auth" && segments[3] === "register" && req.method === "POST") {
         const body = await readJson(req);
         if (!body.username || !body.password) {
-          return fail(res, requestId, 400, "VALIDATION_FAILED", "username 与 password 为必填字段。");
+          return fail(req, res, requestId, 400, "VALIDATION_FAILED", "username 与 password 为必填字段。");
         }
         const user = store.createUser(body);
-        return success(res, requestId, { user, apiKey: user.apiKey }, 201);
+        return success(req, res, requestId, { user, apiKey: user.apiKey }, 201);
       }
 
       if (segments[2] === "auth" && segments[3] === "login" && req.method === "POST") {
         const body = await readJson(req);
         const user = store.findUserByUsername(body.username);
         if (!user || !verifyPassword(body.password, user.passwordHash)) {
-          return fail(res, requestId, 401, "INVALID_CREDENTIALS", "用户名或密码错误。");
+          return fail(req, res, requestId, 401, "INVALID_CREDENTIALS", "用户名或密码错误。");
         }
         const token = signToken(user, config.tokenSecret);
-        return success(res, requestId, {
+        return success(req, res, requestId, {
           token,
           user: publicUser(user),
           apiKey: user.apiKey
@@ -278,35 +296,35 @@ function createApp(overrides = {}) {
       if (segments[2] === "users" && segments[3] === "me" && req.method === "GET") {
         const user = requireLogin(req, res, requestId);
         if (!user) return;
-        return success(res, requestId, { user: publicUser(user) });
+        return success(req, res, requestId, { user: publicUser(user) });
       }
 
       if (segments[2] === "users" && segments[3] === "me" && req.method === "PATCH") {
         const user = requireLogin(req, res, requestId);
         if (!user) return;
         const body = await readJson(req);
-        return success(res, requestId, { user: store.updateUser(user.id, body) });
+        return success(req, res, requestId, { user: store.updateUser(user.id, body) });
       }
 
       if (segments[2] === "apikey" && segments[3] === "rotate" && req.method === "POST") {
         const user = requireLogin(req, res, requestId);
         if (!user) return;
-        return success(res, requestId, { user: store.rotateApiKey(user.id) });
+        return success(req, res, requestId, { user: store.rotateApiKey(user.id) });
       }
 
       if (segments[2] === "categories" && req.method === "GET") {
         if (!requireApiKey(req, res, requestId, url)) return;
-        return success(res, requestId, { items: store.categories() });
+        return success(req, res, requestId, { items: store.categories() });
       }
 
       if (segments[2] === "provinces" && req.method === "GET") {
         if (!requireApiKey(req, res, requestId, url)) return;
-        return success(res, requestId, { items: store.provinces() });
+        return success(req, res, requestId, { items: store.provinces() });
       }
 
       if (segments[2] === "stats" && req.method === "GET") {
         if (!requireApiKey(req, res, requestId, url)) return;
-        return success(res, requestId, store.stats());
+        return success(req, res, requestId, store.stats());
       }
 
       if (segments[2] === "pois" && !segments[3] && req.method === "GET") {
@@ -324,54 +342,54 @@ function createApp(overrides = {}) {
           center,
           radius
         });
-        return success(res, requestId, paginate(items, url.searchParams.get("page"), url.searchParams.get("pageSize")));
+        return success(req, res, requestId, paginate(items, url.searchParams.get("page"), url.searchParams.get("pageSize")));
       }
 
       if (segments[2] === "pois" && !segments[3] && req.method === "POST") {
         if (!requireRole(req, res, requestId, ["maintainer", "admin"])) return;
         const body = await readJson(req);
         if (!body.name || !Number.isFinite(Number(body.lng)) || !Number.isFinite(Number(body.lat))) {
-          return fail(res, requestId, 400, "VALIDATION_FAILED", "新增 POI 至少需要 name、lng、lat。");
+          return fail(req, res, requestId, 400, "VALIDATION_FAILED", "新增 POI 至少需要 name、lng、lat。");
         }
-        return success(res, requestId, { item: store.addPoi(body) }, 201);
+        return success(req, res, requestId, { item: store.addPoi(body) }, 201);
       }
 
       if (segments[2] === "pois" && segments[3] && req.method === "GET") {
         if (!requireApiKey(req, res, requestId, url)) return;
         const item = store.getPoi(decodeURIComponent(segments[3]));
-        if (!item) return fail(res, requestId, 404, "POI_NOT_FOUND", "未找到指定 POI。");
-        return success(res, requestId, { item });
+        if (!item) return fail(req, res, requestId, 404, "POI_NOT_FOUND", "未找到指定 POI。");
+        return success(req, res, requestId, { item });
       }
 
       if (segments[2] === "pois" && segments[3] && ["PATCH", "PUT"].includes(req.method)) {
         if (!requireRole(req, res, requestId, ["maintainer", "admin"])) return;
         const body = await readJson(req);
         const item = store.updatePoi(decodeURIComponent(segments[3]), body);
-        if (!item) return fail(res, requestId, 404, "POI_NOT_FOUND", "未找到指定 POI。");
-        return success(res, requestId, { item });
+        if (!item) return fail(req, res, requestId, 404, "POI_NOT_FOUND", "未找到指定 POI。");
+        return success(req, res, requestId, { item });
       }
 
       if (segments[2] === "pois" && segments[3] && req.method === "DELETE") {
         if (!requireRole(req, res, requestId, ["maintainer", "admin"])) return;
         const deleted = store.deletePoi(decodeURIComponent(segments[3]));
-        if (!deleted) return fail(res, requestId, 404, "POI_NOT_FOUND", "未找到指定 POI。");
-        return success(res, requestId, { deleted: true });
+        if (!deleted) return fail(req, res, requestId, 404, "POI_NOT_FOUND", "未找到指定 POI。");
+        return success(req, res, requestId, { deleted: true });
       }
 
-      return fail(res, requestId, 404, "ROUTE_NOT_FOUND", "未找到接口路径。", {
+      return fail(req, res, requestId, 404, "ROUTE_NOT_FOUND", "未找到接口路径。", {
         resource: url.pathname
       });
     } catch (error) {
       if (error.code === "USERNAME_EXISTS") {
-        return fail(res, requestId, 409, "USERNAME_EXISTS", "用户名已存在。");
+        return fail(req, res, requestId, 409, "USERNAME_EXISTS", "用户名已存在。");
       }
       if (error.status === 400 || error.code === "INVALID_JSON") {
-        return fail(res, requestId, 400, "INVALID_JSON", "请求体必须是合法 JSON。");
+        return fail(req, res, requestId, 400, "INVALID_JSON", "请求体必须是合法 JSON。");
       }
       if (error.message && (error.message.startsWith("bbox") || error.message.startsWith("center"))) {
-        return fail(res, requestId, 400, "INVALID_GEO_QUERY", error.message);
+        return fail(req, res, requestId, 400, "INVALID_GEO_QUERY", error.message);
       }
-      return fail(res, requestId, error.status || 500, "INTERNAL_ERROR", "服务端处理失败。", {
+      return fail(req, res, requestId, error.status || 500, "INTERNAL_ERROR", "服务端处理失败。", {
         message: error.message,
         resource: req.url
       });

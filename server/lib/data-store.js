@@ -65,7 +65,17 @@ class DataStore {
   }
 
   save() {
-    fs.writeFileSync(this.dbPath, JSON.stringify(this.data, null, 2), "utf8");
+    const dir = path.dirname(this.dbPath);
+    const tempPath = path.join(dir, `${path.basename(this.dbPath)}.${process.pid}.${Date.now()}.tmp`);
+    try {
+      fs.writeFileSync(tempPath, JSON.stringify(this.data, null, 2), "utf8");
+      fs.renameSync(tempPath, this.dbPath);
+    } catch (error) {
+      if (fs.existsSync(tempPath)) {
+        fs.rmSync(tempPath, { force: true });
+      }
+      throw error;
+    }
   }
 
   stats() {
