@@ -1,9 +1,10 @@
 {
   "pages": [
+    "pages/me/me",
     "pages/index/index",
     "pages/detail/detail",
-    "pages/me/me",
-    "pages/admin/admin"
+    "pages/admin/admin",
+    "pages/web/web"
   ],
   "window": {
     "navigationBarTitleText": "文保单位 LBS",
@@ -23,12 +24,12 @@
     "borderStyle": "black",
     "list": [
       {
-        "pagePath": "pages/index/index",
-        "text": "地图"
-      },
-      {
         "pagePath": "pages/me/me",
         "text": "账户"
+      },
+      {
+        "pagePath": "pages/index/index",
+        "text": "地图"
       }
     ]
   },

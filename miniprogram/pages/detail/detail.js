@@ -1,3 +1,4 @@
+const app = getApp();
 const api = require("../../utils/api");
 
 Page({
@@ -8,6 +9,11 @@ Page({
   },
 
   onLoad(options) {
+    if (!app.globalData.user) {
+      wx.showToast({ title: "请先登录后查看详情", icon: "none" });
+      wx.switchTab({ url: "/pages/me/me" });
+      return;
+    }
     this.setData({ id: options.id });
     this.loadDetail();
   },
@@ -63,10 +69,18 @@ Page({
     });
   },
 
-  copyWebsite() {
-    wx.setClipboardData({
-      data: this.data.item.website
+  openWebsite() {
+    const website = this.data.item && this.data.item.website;
+    if (!website) return;
+    wx.navigateTo({
+      url: `/pages/web/web?url=${encodeURIComponent(website)}`
     });
+  },
+
+  copyWebsite() {
+    const website = this.data.item && this.data.item.website;
+    if (!website) return;
+    wx.setClipboardData({ data: website });
   },
 
   copyCoordinates() {

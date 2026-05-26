@@ -181,16 +181,8 @@
   transition: height 180ms ease;
 }
 
-.sheet-collapsed {
-  height: 24vh;
-}
-
-.sheet-half {
-  height: 46vh;
-}
-
-.sheet-expanded {
-  height: 74vh;
+.sheet-dragging {
+  transition: none;
 }
 
 .sheet-grip-zone {

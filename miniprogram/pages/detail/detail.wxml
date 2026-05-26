@@ -20,7 +20,7 @@
     <view class="action-grid">
       <button class="primary" bindtap="openLocation">地图导航</button>
       <button class="ghost" bindtap="copyCoordinates">复制坐标</button>
-      <button wx:if="{{item.website}}" class="secondary" bindtap="copyWebsite">资料链接</button>
+      <button wx:if="{{item.website}}" class="secondary" bindtap="openWebsite">打开资料</button>
     </view>
   </view>
 
@@ -50,7 +50,7 @@
       </view>
       <view class="field" wx:if="{{item.website}}">
         <view class="label">资料链接</view>
-        <view class="value link-text">{{item.website}}</view>
+        <view class="value link-text" bindtap="openWebsite">{{item.website}}</view>
       </view>
       <view class="field">
         <view class="label">保护批次</view>
@@ -79,6 +79,7 @@
     </view>
     <view class="button-row detail-actions">
       <button class="ghost action" bindtap="copyJson">复制完整 JSON</button>
+      <button wx:if="{{item.website}}" class="ghost action" bindtap="copyWebsite">复制链接</button>
     </view>
   </view>
 </view>

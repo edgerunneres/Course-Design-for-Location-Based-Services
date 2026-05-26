@@ -52,13 +52,12 @@
     </view>
   </view>
 
-  <view class="result-sheet sheet-{{sheetState}}">
+  <view class="result-sheet {{sheetDragging ? 'sheet-dragging' : ''}}" style="height: {{sheetHeight}}vh;">
     <view
       class="sheet-grip-zone"
       bindtouchstart="onSheetTouchStart"
       bindtouchmove="onSheetTouchMove"
       bindtouchend="onSheetTouchEnd"
-      bindtap="toggleSheet"
     >
       <view class="sheet-handle"></view>
     </view>

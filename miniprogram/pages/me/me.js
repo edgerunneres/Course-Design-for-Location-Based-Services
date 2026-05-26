@@ -10,7 +10,7 @@ Page({
     showDebugConfig: false,
     profileForm: { nickname: "", phone: "", email: "" },
     register: { username: "", password: "", nickname: "" },
-    login: { username: "", password: "" }
+    login: { username: "demo", password: "Demo@123456" }
   },
 
   onShow() {
@@ -72,9 +72,17 @@ Page({
         method: "POST",
         data: this.data.register
       });
-      api.saveAuth({ apiKey: data.apiKey, user: data.user });
+      const loginData = await api.request("/auth/login", {
+        method: "POST",
+        data: {
+          username: this.data.register.username,
+          password: this.data.register.password
+        }
+      });
+      api.saveAuth({ token: loginData.token, apiKey: loginData.apiKey || data.apiKey, user: loginData.user || data.user });
       this.refreshState();
       wx.showToast({ title: "注册成功", icon: "success" });
+      wx.switchTab({ url: "/pages/index/index" });
     } catch (error) {
       wx.showToast({ title: error.message, icon: "none" });
     }
@@ -90,6 +98,7 @@ Page({
       api.saveAuth({ token: data.token, apiKey: data.apiKey, user: data.user });
       this.refreshState();
       wx.showToast({ title: "登录成功", icon: "success" });
+      wx.switchTab({ url: "/pages/index/index" });
     } catch (error) {
       wx.showToast({ title: error.message, icon: "none" });
     }
@@ -126,7 +135,7 @@ Page({
       user: null,
       apiKey: app.globalData.apiKey,
       userInitial: "用",
-      login: { username: "", password: "" }
+      login: { username: "demo", password: "Demo@123456" }
     });
     wx.showToast({ title: "已退出登录", icon: "success" });
   },

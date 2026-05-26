@@ -78,7 +78,7 @@ Page({
     }
   },
 
-  async loadAdminPois(selectedId = "") {
+  async loadAdminPois(selectedId = "", autoSelectFirst = false) {
     try {
       const keyword = this.data.searchKeyword.trim();
       const query = keyword ? `name=${encodeURIComponent(keyword)}&` : "";
@@ -87,19 +87,24 @@ Page({
         "新建文保点",
         ...data.items.map((item) => `${item.id} · ${item.name} · ${item.province || "未填省份"}`)
       ];
-      const matchedIndex = selectedId ? data.items.findIndex((item) => item.id === selectedId) + 1 : this.data.selectedPoiIndex;
-      this.setData({
+      const exactIndex = selectedId ? data.items.findIndex((item) => item.id === selectedId) + 1 : 0;
+      const selectedPoiIndex = exactIndex > 0 ? exactIndex : (autoSelectFirst && data.items.length ? 1 : 0);
+      const nextData = {
         pois: data.items,
         poiOptions: options,
-        selectedPoiIndex: matchedIndex > 0 ? matchedIndex : 0
-      });
+        selectedPoiIndex
+      };
+      if (selectedPoiIndex > 0) {
+        nextData.form = this.formFromPoi(data.items[selectedPoiIndex - 1]);
+      }
+      this.setData(nextData);
     } catch (error) {
       wx.showToast({ title: error.message, icon: "none" });
     }
   },
 
   searchAdminPois() {
-    this.loadAdminPois();
+    this.loadAdminPois("", true);
   },
 
   onPoiSelect(e) {
@@ -112,19 +117,23 @@ Page({
     if (item) this.fillForm(item, index);
   },
 
+  formFromPoi(item) {
+    return {
+      id: item.id || "",
+      name: item.name || "",
+      province: item.province || "",
+      type: item.type || "",
+      address: item.address || "",
+      lng: String(item.lng || item.gcjLng || ""),
+      lat: String(item.lat || item.gcjLat || ""),
+      remark: item.remark || ""
+    };
+  },
+
   fillForm(item, selectedPoiIndex = this.data.selectedPoiIndex) {
     this.setData({
       selectedPoiIndex,
-      form: {
-        id: item.id || "",
-        name: item.name || "",
-        province: item.province || "",
-        type: item.type || "",
-        address: item.address || "",
-        lng: String(item.lng || item.gcjLng || ""),
-        lat: String(item.lat || item.gcjLat || ""),
-        remark: item.remark || ""
-      }
+      form: this.formFromPoi(item)
     });
   },
 

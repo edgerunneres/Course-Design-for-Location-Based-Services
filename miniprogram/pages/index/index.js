@@ -1,3 +1,4 @@
+const app = getApp();
 const api = require("../../utils/api");
 
 const DEFAULT_CENTER = { lat: 35.8617, lng: 104.1954 };
@@ -7,7 +8,8 @@ Page({
   data: {
     center: DEFAULT_CENTER,
     scale: DEFAULT_SCALE,
-    sheetState: "half",
+    sheetHeight: 46,
+    sheetDragging: false,
     radiusOptions: ["2km", "5km", "10km", "20km", "50km"],
     radiusMeters: [2000, 5000, 10000, 20000, 50000],
     radiusIndex: 2,
@@ -34,10 +36,28 @@ Page({
     this.hasInitialViewport = false;
     this.sheetTouchStartY = 0;
     this.sheetTouchLastY = 0;
+    this.sheetStartHeight = this.data.sheetHeight;
+    this.windowHeight = this.getWindowHeight();
+    this.currentSpatialQuery = null;
     this.initMarkerCluster();
+    if (this.ensureLoggedIn()) {
+      this.startLocationWatch();
+      this.loadMeta();
+      this.loadPois({ fit: true });
+    }
+  },
+
+  onShow() {
+    if (!this.ensureLoggedIn()) return;
     this.startLocationWatch();
-    this.loadMeta();
-    this.loadPois({ fit: true });
+    if (!this.data.pois.length && !this.data.loading) {
+      this.loadMeta();
+      this.loadPois({ fit: true });
+    }
+  },
+
+  onHide() {
+    this.stopLocationWatch();
   },
 
   onUnload() {
@@ -54,8 +74,24 @@ Page({
     });
   },
 
+  ensureLoggedIn() {
+    if (app.globalData.user) return true;
+    wx.showToast({ title: "请先登录后使用地图查询", icon: "none" });
+    wx.switchTab({ url: "/pages/me/me" });
+    return false;
+  },
+
+  getWindowHeight() {
+    if (typeof wx.getWindowInfo === "function") {
+      return wx.getWindowInfo().windowHeight || 667;
+    }
+    return wx.getSystemInfoSync().windowHeight || 667;
+  },
+
   startLocationWatch() {
+    if (this.locationWatching) return;
     if (typeof wx.startLocationUpdate !== "function" || typeof wx.onLocationChange !== "function") return;
+    this.locationWatching = true;
     this.handleLocationChange = (res) => {
       this.setData({
         userLocation: { lat: res.latitude, lng: res.longitude }
@@ -75,9 +111,11 @@ Page({
     if (typeof wx.stopLocationUpdate === "function") {
       wx.stopLocationUpdate({});
     }
+    this.locationWatching = false;
   },
 
   async loadMeta() {
+    if (!this.ensureLoggedIn()) return;
     try {
       const [categories, provinces] = await Promise.all([
         api.request("/categories"),
@@ -111,6 +149,7 @@ Page({
   },
 
   async loadPois(extra = {}) {
+    if (!this.ensureLoggedIn()) return;
     this.setData({ loading: true });
     try {
       const data = await api.request(`/pois?${this.buildQuery(extra)}`);
@@ -231,6 +270,7 @@ Page({
   },
 
   loadByCenterRadius() {
+    if (!this.ensureLoggedIn()) return;
     const radius = this.data.radiusMeters[this.data.radiusIndex] || 10000;
     const run = (center) => {
       this.setData({
@@ -238,11 +278,12 @@ Page({
         scale: this.scaleForRadius(radius),
         lastMode: "center"
       });
-      this.loadPois({
+      this.currentSpatialQuery = {
         center: `${center.lng},${center.lat}`,
         radius,
         preserveViewport: true
-      });
+      };
+      this.loadPois(this.currentSpatialQuery);
     };
     if (!this.mapContext || typeof this.mapContext.getCenterLocation !== "function") {
       run(this.data.center);
@@ -255,23 +296,57 @@ Page({
   },
 
   loadByMapBounds() {
+    if (!this.ensureLoggedIn()) return;
     this.mapContext.getRegion({
       success: (res) => {
         const sw = res.southwest;
         const ne = res.northeast;
         this.setData({ lastMode: "bounds" });
-        this.loadPois({
+        this.currentSpatialQuery = {
           bbox: `${sw.longitude},${sw.latitude},${ne.longitude},${ne.latitude}`,
           preserveViewport: true
-        });
+        };
+        this.loadPois(this.currentSpatialQuery);
       },
       fail: () => this.toast("无法读取当前地图视野")
     });
   },
 
   searchPois() {
-    this.setData({ lastMode: "normal" });
+    if (!this.ensureLoggedIn()) return;
+    this.reloadCurrentQuery();
+  },
+
+  reloadCurrentQuery() {
+    if (this.data.lastMode === "bounds") {
+      this.loadByMapBounds();
+      return;
+    }
+    if (this.data.lastMode === "center") {
+      this.refreshCenterRadiusQuery();
+      return;
+    }
     this.loadPois({ fit: true });
+  },
+
+  refreshCenterRadiusQuery() {
+    const radius = this.data.radiusMeters[this.data.radiusIndex] || 10000;
+    const run = (center) => {
+      this.currentSpatialQuery = {
+        center: `${center.lng},${center.lat}`,
+        radius,
+        preserveViewport: true
+      };
+      this.loadPois(this.currentSpatialQuery);
+    };
+    if (!this.mapContext || typeof this.mapContext.getCenterLocation !== "function") {
+      run(this.data.center);
+      return;
+    }
+    this.mapContext.getCenterLocation({
+      success: (res) => run({ lat: res.latitude, lng: res.longitude }),
+      fail: () => run(this.data.center)
+    });
   },
 
   onRegionChange(event) {
@@ -282,38 +357,23 @@ Page({
 
   onSheetTouchStart(event) {
     if (!event.touches || !event.touches[0]) return;
+    this.windowHeight = this.getWindowHeight();
     this.sheetTouchStartY = event.touches[0].clientY;
     this.sheetTouchLastY = this.sheetTouchStartY;
+    this.sheetStartHeight = this.data.sheetHeight;
+    this.setData({ sheetDragging: true });
   },
 
   onSheetTouchMove(event) {
     if (!event.touches || !event.touches[0]) return;
     this.sheetTouchLastY = event.touches[0].clientY;
+    const delta = this.sheetTouchLastY - this.sheetTouchStartY;
+    const nextHeight = this.sheetStartHeight - (delta / this.windowHeight) * 100;
+    this.setData({ sheetHeight: Math.max(18, Math.min(82, Number(nextHeight.toFixed(1)))) });
   },
 
   onSheetTouchEnd() {
-    const delta = this.sheetTouchLastY - this.sheetTouchStartY;
-    if (Math.abs(delta) < 18) {
-      this.toggleSheet();
-      return;
-    }
-    if (delta < 0) this.expandSheet();
-    if (delta > 0) this.collapseSheet();
-  },
-
-  toggleSheet() {
-    const current = this.data.sheetState;
-    this.setData({ sheetState: current === "expanded" ? "half" : "expanded" });
-  },
-
-  expandSheet() {
-    const current = this.data.sheetState;
-    this.setData({ sheetState: current === "collapsed" ? "half" : "expanded" });
-  },
-
-  collapseSheet() {
-    const current = this.data.sheetState;
-    this.setData({ sheetState: current === "expanded" ? "half" : "collapsed" });
+    this.setData({ sheetDragging: false });
   },
 
   onNameInput(event) {
@@ -324,29 +384,27 @@ Page({
     const value = this.data.provinces[event.detail.value];
     this.setData({
       "filters.province": value === "全部省份" ? "" : value,
-      lastMode: "normal"
     });
-    this.loadPois({ fit: true });
+    this.reloadCurrentQuery();
   },
 
   onCategoryChange(event) {
     const value = this.data.categories[event.detail.value];
     this.setData({
       "filters.category": value === "全部类别" ? "" : value,
-      lastMode: "normal"
     });
-    this.loadPois({ fit: true });
+    this.reloadCurrentQuery();
   },
 
   toggleExt() {
     this.setData({
-      "filters.hasExt": !this.data.filters.hasExt,
-      lastMode: "normal"
+      "filters.hasExt": !this.data.filters.hasExt
     });
-    this.loadPois({ fit: true });
+    this.reloadCurrentQuery();
   },
 
   clearFilters() {
+    this.currentSpatialQuery = null;
     this.setData({
       filters: { name: "", province: "", category: "", hasExt: false },
       lastMode: "normal",
