@@ -35,8 +35,13 @@ Page({
     this.sheetTouchStartY = 0;
     this.sheetTouchLastY = 0;
     this.initMarkerCluster();
+    this.startLocationWatch();
     this.loadMeta();
     this.loadPois({ fit: true });
+  },
+
+  onUnload() {
+    this.stopLocationWatch();
   },
 
   initMarkerCluster() {
@@ -47,6 +52,29 @@ Page({
       gridSize: 60,
       complete: () => {}
     });
+  },
+
+  startLocationWatch() {
+    if (typeof wx.startLocationUpdate !== "function" || typeof wx.onLocationChange !== "function") return;
+    this.handleLocationChange = (res) => {
+      this.setData({
+        userLocation: { lat: res.latitude, lng: res.longitude }
+      });
+    };
+    wx.onLocationChange(this.handleLocationChange);
+    wx.startLocationUpdate({
+      type: "gcj02",
+      fail: () => {}
+    });
+  },
+
+  stopLocationWatch() {
+    if (this.handleLocationChange && typeof wx.offLocationChange === "function") {
+      wx.offLocationChange(this.handleLocationChange);
+    }
+    if (typeof wx.stopLocationUpdate === "function") {
+      wx.stopLocationUpdate({});
+    }
   },
 
   async loadMeta() {
