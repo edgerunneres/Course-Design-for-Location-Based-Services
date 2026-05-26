@@ -21,8 +21,8 @@
     </view>
 
     <view class="search-row">
-      <input class="search-input" placeholder="搜索名称，如 故宫、三塔、遗址" value="{{filters.name}}" bindinput="onNameInput" confirm-type="search" bindconfirm="loadPois" />
-      <button class="search-btn primary" bindtap="loadPois">查找</button>
+      <input class="search-input" placeholder="搜索名称，如 故宫、三塔、遗址" value="{{filters.name}}" bindinput="onNameInput" confirm-type="search" bindconfirm="searchPois" />
+      <button class="search-btn primary" bindtap="searchPois">查找</button>
     </view>
 
     <view class="quick-row">
@@ -45,14 +45,22 @@
     </view>
   </view>
 
-  <view class="result-sheet">
-    <view class="sheet-handle"></view>
+  <view class="result-sheet sheet-{{sheetState}}">
+    <view
+      class="sheet-grip-zone"
+      bindtouchstart="onSheetTouchStart"
+      bindtouchmove="onSheetTouchMove"
+      bindtouchend="onSheetTouchEnd"
+      bindtap="toggleSheet"
+    >
+      <view class="sheet-handle"></view>
+    </view>
     <view class="sheet-head">
-      <view>
+      <view class="sheet-copy">
         <view class="sheet-title">{{loading ? '正在加载' : resultTitle}}</view>
         <view class="sheet-subtitle">{{resultSubtitle}}</view>
       </view>
-      <button class="small-btn ghost" bindtap="loadPois">刷新</button>
+      <button class="small-btn ghost" bindtap="searchPois">刷新</button>
     </view>
 
     <scroll-view class="poi-list" scroll-y enhanced show-scrollbar="{{false}}">

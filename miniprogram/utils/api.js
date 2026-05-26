@@ -57,8 +57,18 @@ function saveAuth({ apiBase, apiKey, token, user }) {
   }
 }
 
+function clearAuth() {
+  app.globalData.apiKey = config.DEMO_API_KEY;
+  app.globalData.token = "";
+  app.globalData.user = null;
+  wx.removeStorageSync("apiKey");
+  wx.removeStorageSync("token");
+  wx.removeStorageSync("user");
+}
+
 module.exports = {
   getBase,
   request,
-  saveAuth
+  saveAuth,
+  clearAuth
 };

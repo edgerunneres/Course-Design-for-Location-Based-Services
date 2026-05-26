@@ -7,11 +7,16 @@ Page({
     apiKey: "",
     user: null,
     userInitial: "用",
+    showDebugConfig: false,
     register: { username: "", password: "", nickname: "" },
-    login: { username: "demo", password: "Demo@123456" }
+    login: { username: "", password: "" }
   },
 
   onShow() {
+    this.refreshState();
+  },
+
+  refreshState() {
     this.setData({
       apiBase: app.globalData.apiBase,
       apiKey: app.globalData.apiKey,
@@ -23,6 +28,14 @@ Page({
   getInitial(user) {
     if (!user || !user.nickname) return "用";
     return String(user.nickname).slice(0, 1);
+  },
+
+  isMaintainer(user) {
+    return Boolean(user && ["maintainer", "admin"].includes(user.role));
+  },
+
+  toggleDebugConfig() {
+    this.setData({ showDebugConfig: !this.data.showDebugConfig });
   },
 
   onApiBaseInput(e) { this.setData({ apiBase: e.detail.value }); },
@@ -50,7 +63,7 @@ Page({
         data: this.data.register
       });
       api.saveAuth({ apiKey: data.apiKey, user: data.user });
-      this.setData({ apiKey: data.apiKey, user: data.user, userInitial: this.getInitial(data.user) });
+      this.refreshState();
       wx.showToast({ title: "注册成功", icon: "success" });
     } catch (error) {
       wx.showToast({ title: error.message, icon: "none" });
@@ -65,7 +78,7 @@ Page({
         data: this.data.login
       });
       api.saveAuth({ token: data.token, apiKey: data.apiKey, user: data.user });
-      this.setData({ apiKey: data.apiKey, user: data.user, userInitial: this.getInitial(data.user) });
+      this.refreshState();
       wx.showToast({ title: "登录成功", icon: "success" });
     } catch (error) {
       wx.showToast({ title: error.message, icon: "none" });
@@ -76,10 +89,29 @@ Page({
     try {
       const data = await api.request("/apikey/rotate", { method: "POST" });
       api.saveAuth({ apiKey: data.user.apiKey, user: data.user });
-      this.setData({ apiKey: data.user.apiKey, user: data.user, userInitial: this.getInitial(data.user) });
+      this.refreshState();
       wx.showToast({ title: "已更新 APIKEY", icon: "success" });
     } catch (error) {
       wx.showToast({ title: error.message, icon: "none" });
     }
+  },
+
+  logout() {
+    api.clearAuth();
+    this.setData({
+      user: null,
+      apiKey: app.globalData.apiKey,
+      userInitial: "用",
+      login: { username: "", password: "" }
+    });
+    wx.showToast({ title: "已退出登录", icon: "success" });
+  },
+
+  openAdmin() {
+    if (!this.isMaintainer(this.data.user)) {
+      wx.showToast({ title: "当前账号不是维护人员", icon: "none" });
+      return;
+    }
+    wx.navigateTo({ url: "/pages/admin/admin" });
   }
 });

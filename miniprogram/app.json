@@ -29,10 +29,6 @@
       {
         "pagePath": "pages/me/me",
         "text": "账户"
-      },
-      {
-        "pagePath": "pages/admin/admin",
-        "text": "维护"
       }
     ]
   },

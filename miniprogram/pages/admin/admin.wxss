@@ -45,6 +45,47 @@
   gap: 14rpx;
 }
 
+.search-row {
+  display: flex;
+  gap: 14rpx;
+  align-items: center;
+}
+
+.search-input {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.search-btn {
+  width: 132rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+}
+
+.picker-control,
+.readonly-id {
+  min-height: 72rpx;
+  line-height: 72rpx;
+  border: 1px solid #ded8c9;
+  border-radius: 12rpx;
+  padding: 0 18rpx;
+  margin-bottom: 16rpx;
+  background: #fff;
+  box-sizing: border-box;
+  color: #17231f;
+  font-size: 26rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.readonly-id {
+  background: #fbfaf5;
+  color: #68736d;
+}
+
 .textarea {
   width: 100%;
   min-height: 160rpx;
@@ -62,6 +103,10 @@
   line-height: 74rpx;
   font-size: 27rpx;
   font-weight: 700;
+}
+
+.top-gap {
+  margin-top: 16rpx;
 }
 
 .action {

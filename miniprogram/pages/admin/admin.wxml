@@ -1,36 +1,57 @@
 <view class="page admin-page">
   <view class="admin-hero">
     <view class="hero-title">POI 数据维护</view>
-    <view class="hero-subtitle">维护人员角色可执行单项新增、修改和删除操作。</view>
+    <view class="hero-subtitle">只有维护人员角色可新增、修改和删除文保点。</view>
   </view>
 
-  <view class="section surface">
-    <view class="section-title">维护人员登录</view>
-    <view class="form-grid">
-      <input class="input standalone" placeholder="用户名" value="{{login.username}}" bindinput="onUsername" />
-      <input class="input standalone" password placeholder="密码" value="{{login.password}}" bindinput="onPassword" />
+  <view class="section surface" wx:if="{{!isMaintainer}}">
+    <view class="section-title">{{user ? '无维护权限' : '维护人员登录'}}</view>
+    <view wx:if="{{user}}" class="section-desc">当前账号 {{user.username}} 的角色是 {{user.role}}，不能进入维护工作台。</view>
+    <view wx:if="{{!user}}">
+      <view class="form-grid">
+        <input class="input standalone" placeholder="用户名" value="{{login.username}}" bindinput="onUsername" />
+        <input class="input standalone" password placeholder="密码" value="{{login.password}}" bindinput="onPassword" />
+      </view>
+      <button class="primary full" bindtap="loginMaintainer">登录维护角色</button>
     </view>
-    <button class="primary full" bindtap="loginMaintainer">登录维护角色</button>
   </view>
 
-  <view class="section surface">
-    <view class="section-title">POI 新增 / 修改</view>
-    <view class="section-desc">修改时填写已有 POI ID；新增时留空，由服务端自动生成。</view>
-    <input class="input standalone" placeholder="POI ID" value="{{form.id}}" bindinput="onId" />
-    <input class="input standalone" placeholder="名称" value="{{form.name}}" bindinput="onName" />
-    <view class="form-grid">
-      <input class="input standalone" placeholder="省份，如 北京市" value="{{form.province}}" bindinput="onProvince" />
-      <input class="input standalone" placeholder="类别，如 古建筑" value="{{form.type}}" bindinput="onType" />
+  <view wx:else>
+    <view class="section surface">
+      <view class="section-title">选择已有文保点</view>
+      <view class="section-desc">先搜索并选择已有记录，表单会自动回填；选择“新建文保点”则进入新增模式。</view>
+      <view class="search-row">
+        <input class="input standalone search-input" placeholder="按名称搜索，如 故宫、三塔" value="{{searchKeyword}}" bindinput="onSearchInput" confirm-type="search" bindconfirm="searchAdminPois" />
+        <button class="primary search-btn" bindtap="searchAdminPois">搜索</button>
+      </view>
+      <picker mode="selector" range="{{poiOptions}}" value="{{selectedPoiIndex}}" bindchange="onPoiSelect">
+        <view class="picker-control">{{poiOptions[selectedPoiIndex]}}</view>
+      </picker>
+      <button class="ghost full top-gap" bindtap="resetForm">新建文保点</button>
     </view>
-    <input class="input standalone" placeholder="地址" value="{{form.address}}" bindinput="onAddress" />
-    <view class="form-grid">
-      <input class="input standalone" placeholder="经度" value="{{form.lng}}" bindinput="onLng" />
-      <input class="input standalone" placeholder="纬度" value="{{form.lat}}" bindinput="onLat" />
-    </view>
-    <textarea class="textarea" placeholder="备注/扩展信息" value="{{form.remark}}" bindinput="onRemark" />
-    <view class="button-row">
-      <button class="primary action" bindtap="savePoi">{{form.id ? '修改' : '新增'}}</button>
-      <button class="danger action" bindtap="deletePoi" wx:if="{{form.id}}">删除</button>
+
+    <view class="section surface">
+      <view class="section-title">{{form.id ? '修改文保点' : '新增文保点'}}</view>
+      <view wx:if="{{form.id}}" class="readonly-id">POI ID：{{form.id}}</view>
+      <input class="input standalone" placeholder="名称" value="{{form.name}}" bindinput="onName" />
+      <view class="form-grid">
+        <picker mode="selector" range="{{provinces}}" bindchange="onProvinceChange">
+          <view class="picker-control">{{form.province || '选择省份'}}</view>
+        </picker>
+        <picker mode="selector" range="{{categories}}" bindchange="onTypeChange">
+          <view class="picker-control">{{form.type || '选择类别'}}</view>
+        </picker>
+      </view>
+      <input class="input standalone" placeholder="地址" value="{{form.address}}" bindinput="onAddress" />
+      <view class="form-grid">
+        <input class="input standalone" placeholder="经度" value="{{form.lng}}" bindinput="onLng" />
+        <input class="input standalone" placeholder="纬度" value="{{form.lat}}" bindinput="onLat" />
+      </view>
+      <textarea class="textarea" placeholder="备注/扩展信息" value="{{form.remark}}" bindinput="onRemark" />
+      <view class="button-row">
+        <button class="primary action" bindtap="savePoi">{{form.id ? '保存修改' : '新增'}}</button>
+        <button class="danger action" bindtap="deletePoi" wx:if="{{form.id}}">删除</button>
+      </view>
     </view>
   </view>
 </view>
