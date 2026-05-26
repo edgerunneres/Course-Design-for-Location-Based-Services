@@ -1,7 +1,7 @@
 const app = getApp();
 const api = require("../../utils/api");
 
-const DEFAULT_CENTER = { lat: 35.8617, lng: 104.1954 };
+const DEFAULT_CENTER = { lat: 36.8, lng: 104.2 };
 const DEFAULT_SCALE = 4;
 
 Page({
@@ -46,7 +46,7 @@ Page({
     if (this.ensureLoggedIn()) {
       this.startLocationWatch();
       this.loadMeta();
-      this.loadPois({ fit: true });
+      this.loadPois({ preserveViewport: true });
     }
   },
 
@@ -55,7 +55,7 @@ Page({
     this.startLocationWatch();
     if (!this.data.pois.length && !this.data.loading) {
       this.loadMeta();
-      this.loadPois({ fit: true });
+      this.loadPois({ preserveViewport: true });
     }
   },
 
@@ -406,7 +406,7 @@ Page({
       scale: DEFAULT_SCALE,
       circles: []
     });
-    this.loadPois({ fit: true });
+    this.loadPois({ preserveViewport: true });
   },
 
   onMarkerTap(event) {
