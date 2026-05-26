@@ -9,8 +9,13 @@
   />
 
   <view class="place-card surface">
-    <view class="place-kicker">{{item.province}} · {{item.batch}}</view>
-    <view class="place-title">{{item.name}}</view>
+    <view class="place-heading">
+      <view class="place-icon">⌖</view>
+      <view class="place-copy">
+        <view class="place-kicker">{{item.province}} · {{item.batch}}</view>
+        <view class="place-title">{{item.name}}</view>
+      </view>
+    </view>
     <view class="tag-row">
       <text class="tag strong">{{item.type}}</text>
       <text class="tag">{{item.age || '时代待考'}}</text>
@@ -18,14 +23,14 @@
     </view>
 
     <view class="action-grid">
-      <button class="primary" bindtap="openLocation">地图导航</button>
-      <button class="ghost" bindtap="copyCoordinates">复制坐标</button>
-      <button wx:if="{{item.website}}" class="secondary" bindtap="openWebsite">打开资料</button>
+      <button class="primary" bindtap="openLocation"><text class="btn-icon">⌖</text>地图导航</button>
+      <button class="ghost" bindtap="copyCoordinates"><text class="btn-icon">⧉</text>复制坐标</button>
+      <button wx:if="{{item.website}}" class="secondary" bindtap="openWebsite"><text class="btn-icon">↗</text>打开资料</button>
     </view>
   </view>
 
   <view class="detail-body">
-    <view class="section-title">基础信息</view>
+    <view class="section-title"><text class="title-icon">i</text>基础信息</view>
     <view class="info-grid">
       <view class="field">
         <view class="label">地址</view>
@@ -41,7 +46,7 @@
       </view>
     </view>
 
-    <view class="section-title ext-title">扩展信息</view>
+    <view class="section-title ext-title"><text class="title-icon">＋</text>扩展信息</view>
     <image wx:if="{{item.imageUrl}}" class="heritage-image" mode="aspectFill" src="{{item.imageUrl}}" bindtap="previewImage" />
     <view class="info-grid">
       <view class="field highlight">
@@ -78,10 +83,10 @@
       </view>
     </view>
     <view class="button-row detail-actions">
-      <button class="ghost action" bindtap="copyJson">复制完整 JSON</button>
-      <button wx:if="{{item.website}}" class="ghost action" bindtap="copyWebsite">复制链接</button>
+      <button class="ghost action" bindtap="copyJson"><text class="btn-icon">⧉</text>复制完整 JSON</button>
+      <button wx:if="{{item.website}}" class="ghost action" bindtap="copyWebsite"><text class="btn-icon">↗</text>复制链接</button>
     </view>
   </view>
 </view>
 
-<view class="page loading" wx:else>正在加载详情...</view>
+<view class="page loading" wx:else><text class="empty-icon">⌖</text>正在加载详情...</view>

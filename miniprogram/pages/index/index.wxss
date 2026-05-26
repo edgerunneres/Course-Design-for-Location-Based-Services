@@ -2,7 +2,7 @@
   position: relative;
   height: 100vh;
   overflow: hidden;
-  background: #eef0ea;
+  background: #eef3f8;
 }
 
 .map {
@@ -28,10 +28,11 @@
   top: 0;
   width: 54rpx;
   height: 54rpx;
-  border: 4rpx solid #a4382f;
+  border: 4rpx solid #0a84ff;
   border-radius: 999rpx;
   box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.46);
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 0 0 10rpx rgba(10, 132, 255, 0.12);
 }
 
 .target-dot {
@@ -41,7 +42,7 @@
   width: 10rpx;
   height: 10rpx;
   border-radius: 999rpx;
-  background: #a4382f;
+  background: #0a84ff;
 }
 
 .search-console {
@@ -49,7 +50,7 @@
   top: 24rpx;
   left: 24rpx;
   right: 24rpx;
-  padding: 22rpx;
+  padding: 24rpx;
   z-index: 2;
 }
 
@@ -60,8 +61,27 @@
   margin-bottom: 18rpx;
 }
 
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  min-width: 0;
+}
+
+.brand-mark {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 18rpx;
+  line-height: 64rpx;
+  text-align: center;
+  background: linear-gradient(145deg, #1d1d1f, #3a3a3c);
+  color: #0a84ff;
+  font-size: 32rpx;
+  box-shadow: 0 14rpx 28rpx rgba(0, 0, 0, 0.18);
+}
+
 .eyebrow {
-  color: #8b6f2e;
+  color: #6f806d;
   font-size: 21rpx;
   letter-spacing: 0;
 }
@@ -70,17 +90,22 @@
   margin-top: 4rpx;
   font-size: 34rpx;
   font-weight: 800;
-  color: #10231f;
+  color: #1d1d1f;
 }
 
 .count-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
   min-width: 96rpx;
   padding: 8rpx 14rpx;
   border-radius: 999rpx;
-  background: #10231f;
+  background: #0a84ff;
   color: #fff;
   font-size: 23rpx;
   text-align: center;
+  box-shadow: 0 10rpx 24rpx rgba(10, 132, 255, 0.18);
 }
 
 .search-row {
@@ -89,14 +114,29 @@
   align-items: center;
 }
 
-.search-input {
+.search-input-wrap {
   flex: 1;
   height: 74rpx;
-  padding: 0 22rpx;
-  background: #f7f5ee;
-  border: 1px solid #ded8c9;
-  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 0 20rpx;
+  background: #f7f8fa;
+  border: 1px solid rgba(29, 29, 31, 0.08);
+  border-radius: 16rpx;
   box-sizing: border-box;
+}
+
+.native-search-icon {
+  flex: none;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  height: 72rpx;
+  padding: 0;
+  background: transparent;
   font-size: 27rpx;
 }
 
@@ -118,22 +158,31 @@
 
 .quick-chip {
   min-height: 58rpx;
-  line-height: 58rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
   text-align: center;
-  border-radius: 12rpx;
-  background: #eef1ed;
-  color: #17231f;
-  font-size: 24rpx;
+  border-radius: 14rpx;
+  background: #f2f3f5;
+  color: #1d1d1f;
+  font-size: 23rpx;
 }
 
 .radius-chip {
-  background: #fff8e4;
+  background: #fff8e1;
   color: #6c4f0e;
 }
 
 .quick-chip.active {
-  background: #d7b46a;
-  color: #21190a;
+  background: #0a84ff;
+  color: #fff;
+  box-shadow: 0 10rpx 22rpx rgba(10, 132, 255, 0.18);
+  font-weight: 700;
+}
+
+.quick-chip.active .chip-icon {
+  color: #ffffff;
   font-weight: 700;
 }
 
@@ -150,12 +199,15 @@
 
 .filter-control {
   height: 62rpx;
-  line-height: 62rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
   padding: 0 14rpx;
   background: #ffffff;
-  border: 1px solid #ded8c9;
-  border-radius: 12rpx;
-  color: #263630;
+  border: 1px solid rgba(29, 29, 31, 0.08);
+  border-radius: 14rpx;
+  color: #1d1d1f;
   font-size: 23rpx;
   text-align: center;
   overflow: hidden;
@@ -164,7 +216,15 @@
 }
 
 .ext-control {
-  background: #fbfaf5;
+  background: #f7faff;
+}
+
+.filter-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .result-sheet {
@@ -172,9 +232,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: #fffdf8;
+  background: #fffefb;
   border-radius: 24rpx 24rpx 0 0;
-  box-shadow: 0 -18rpx 42rpx rgba(16, 35, 31, 0.16);
+  box-shadow: 0 -24rpx 56rpx rgba(0, 0, 0, 0.14);
   padding: 0 22rpx env(safe-area-inset-bottom);
   box-sizing: border-box;
   z-index: 3;
@@ -196,7 +256,7 @@
   width: 84rpx;
   height: 9rpx;
   border-radius: 999rpx;
-  background: #bfb6a4;
+  background: #ccd4d0;
 }
 
 .sheet-head {
@@ -212,7 +272,7 @@
 }
 
 .sheet-title {
-  color: #10231f;
+  color: #1d1d1f;
   font-size: 31rpx;
   font-weight: 800;
 }
@@ -227,10 +287,11 @@
 }
 
 .small-btn {
-  width: 112rpx;
+  width: 140rpx;
+  flex: none;
   height: 58rpx;
-  line-height: 58rpx;
   font-size: 24rpx;
+  white-space: nowrap;
 }
 
 .poi-list {
@@ -242,7 +303,20 @@
   justify-content: space-between;
   gap: 14rpx;
   padding: 18rpx 0;
-  border-bottom: 1px solid #eee7d8;
+  border-bottom: 1px solid rgba(29, 29, 31, 0.08);
+}
+
+.poi-icon {
+  width: 48rpx;
+  height: 48rpx;
+  margin-top: 4rpx;
+  border-radius: 14rpx;
+  line-height: 48rpx;
+  text-align: center;
+  flex: none;
+  background: #eef5ff;
+  color: #0a84ff;
+  font-size: 24rpx;
 }
 
 .poi-main {
@@ -253,7 +327,7 @@
 .poi-title {
   font-size: 30rpx;
   font-weight: 800;
-  color: #10231f;
+  color: #1d1d1f;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -262,7 +336,7 @@
 .poi-meta {
   margin-top: 8rpx;
   font-size: 23rpx;
-  color: #8b6f2e;
+  color: #80672c;
 }
 
 .poi-address {
@@ -275,8 +349,8 @@
 .poi-extra {
   margin-top: 8rpx;
   padding: 10rpx 12rpx;
-  border-radius: 10rpx;
-  background: #fbf2d7;
+  border-radius: 12rpx;
+  background: #fff6d9;
   color: #6c4f0e;
   font-size: 22rpx;
   line-height: 1.35;
@@ -296,13 +370,17 @@
 
 .distance,
 .ext-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4rpx;
   padding: 6rpx 10rpx;
   border-radius: 999rpx;
   font-size: 20rpx;
 }
 
 .distance {
-  background: #eef1ed;
+  background: #eef5ff;
   color: #2b3b35;
 }
 
@@ -312,8 +390,23 @@
 }
 
 .empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
   padding: 58rpx 20rpx;
   text-align: center;
   color: #68736d;
   font-size: 26rpx;
+}
+
+.empty-icon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 18rpx;
+  line-height: 64rpx;
+  text-align: center;
+  background: #eef3f1;
+  color: #0a84ff;
+  font-size: 32rpx;
 }

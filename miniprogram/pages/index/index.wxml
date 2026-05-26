@@ -22,37 +22,43 @@
 
   <view class="search-console surface">
     <view class="brand-row">
-      <view>
-        <view class="eyebrow">National Heritage POI</view>
-        <view class="brand-title">全国重点文保单位</view>
+      <view class="brand-lockup">
+        <view class="brand-mark">⌖</view>
+        <view>
+          <view class="eyebrow">National Heritage POI</view>
+          <view class="brand-title">全国重点文保单位</view>
+        </view>
       </view>
-      <view class="count-pill">{{pagination.total || 0}} 条</view>
+      <view class="count-pill"><text class="chip-icon">◇</text>{{pagination.total || 0}} 条</view>
     </view>
 
     <view class="search-row">
-      <input class="search-input" placeholder="搜索名称，如 故宫、三塔、遗址" value="{{filters.name}}" bindinput="onNameInput" confirm-type="search" bindconfirm="searchPois" />
-      <button class="search-btn primary" bindtap="searchPois">查找</button>
+      <view class="search-input-wrap">
+        <icon class="native-search-icon" type="search" size="15" color="#5f6f69" />
+        <input class="search-input" placeholder="搜索名称，如 故宫、三塔、遗址" value="{{filters.name}}" bindinput="onNameInput" confirm-type="search" bindconfirm="searchPois" />
+      </view>
+      <button class="search-btn primary" bindtap="searchPois"><text class="btn-icon">⌕</text>查找</button>
     </view>
 
     <view class="quick-row">
-      <view class="quick-chip {{lastMode === 'bounds' ? 'active' : ''}}" bindtap="loadByMapBounds">当前视野</view>
-      <view class="quick-chip {{lastMode === 'center' ? 'active' : ''}}" bindtap="loadByCenterRadius">中心半径</view>
+      <view class="quick-chip {{lastMode === 'bounds' ? 'active' : ''}}" bindtap="loadByMapBounds"><text class="chip-icon">▣</text>当前视野</view>
+      <view class="quick-chip {{lastMode === 'center' ? 'active' : ''}}" bindtap="loadByCenterRadius"><text class="chip-icon">◎</text>中心半径</view>
       <picker mode="selector" range="{{radiusOptions}}" value="{{radiusIndex}}" bindchange="onRadiusChange">
-        <view class="quick-chip radius-chip">{{radiusOptions[radiusIndex]}}</view>
+        <view class="quick-chip radius-chip"><text class="chip-icon">↕</text>{{radiusOptions[radiusIndex]}}</view>
       </picker>
-      <view class="quick-chip" bindtap="locateMe">定位</view>
-      <view class="quick-chip muted" bindtap="clearFilters">重置</view>
+      <view class="quick-chip" bindtap="locateMe"><text class="chip-icon">⌖</text>定位</view>
+      <view class="quick-chip muted" bindtap="clearFilters"><text class="chip-icon">×</text>重置</view>
     </view>
 
     <view class="filter-row">
       <picker mode="selector" range="{{provinces}}" bindchange="onProvinceChange">
-        <view class="filter-control">{{filters.province || '全部省份'}}</view>
+        <view class="filter-control"><text class="chip-icon">⌂</text><text class="filter-text">{{filters.province || '全部省份'}}</text></view>
       </picker>
       <picker mode="selector" range="{{categories}}" bindchange="onCategoryChange">
-        <view class="filter-control">{{filters.category || '全部类别'}}</view>
+        <view class="filter-control"><text class="chip-icon">◇</text><text class="filter-text">{{filters.category || '全部类别'}}</text></view>
       </picker>
       <view class="filter-control ext-control" bindtap="toggleExt">
-        <text>{{filters.hasExt ? '含扩展信息' : '不限扩展'}}</text>
+        <text class="chip-icon">＋</text><text class="filter-text">{{filters.hasExt ? '含扩展信息' : '不限扩展'}}</text>
       </view>
     </view>
   </view>
@@ -71,11 +77,12 @@
         <view class="sheet-title">{{loading ? '正在加载' : resultTitle}}</view>
         <view class="sheet-subtitle">{{resultSubtitle}}</view>
       </view>
-      <button class="small-btn ghost" bindtap="searchPois">刷新</button>
+      <button class="small-btn ghost" bindtap="searchPois"><text class="btn-icon">↻</text>刷新</button>
     </view>
 
     <scroll-view class="poi-list" scroll-y enhanced show-scrollbar="{{false}}">
       <view wx:for="{{pois}}" wx:key="id" class="poi-item" data-id="{{item.id}}" bindtap="openDetail">
+        <view class="poi-icon">⌖</view>
         <view class="poi-main">
           <view class="poi-title">{{item.name}}</view>
           <view class="poi-meta">{{item.province}} · {{item.type}} · {{item.batch}}</view>
@@ -84,10 +91,10 @@
         </view>
         <view class="poi-side">
           <view wx:if="{{item.distance}}" class="distance">{{item.distance}}m</view>
-          <view wx:if="{{item.hasExt}}" class="ext-dot">资料</view>
+          <view wx:if="{{item.hasExt}}" class="ext-dot"><text class="chip-icon">↗</text>资料</view>
         </view>
       </view>
-      <view wx:if="{{!loading && pois.length === 0}}" class="empty">当前条件下没有结果，请调整关键词或地图范围。</view>
+      <view wx:if="{{!loading && pois.length === 0}}" class="empty"><text class="empty-icon">⌕</text>当前条件下没有结果，请调整关键词或地图范围。</view>
     </scroll-view>
   </view>
 </view>

@@ -1,57 +1,63 @@
 <view class="page account-page">
   <view class="account-hero">
-    <view class="hero-title">账户中心</view>
-    <view class="hero-subtitle">公众用户用于查询文保 POI；维护人员登录后才能进入数据维护。</view>
+    <view class="hero-lockup">
+      <view class="hero-icon">⌾</view>
+      <view>
+        <view class="hero-title">账户中心</view>
+        <view class="hero-subtitle">公众用户用于查询文保 POI；维护人员登录后才能进入数据维护。</view>
+      </view>
+    </view>
   </view>
 
   <view class="section surface" wx:if="{{user}}">
-    <view class="section-title">当前用户</view>
+    <view class="section-title"><text class="title-icon">人</text>当前用户</view>
     <view class="profile-card">
       <view class="avatar">{{userInitial}}</view>
       <view class="profile-copy">
         <view class="profile-name">{{user.nickname}}</view>
         <view class="profile-meta">{{user.username}} · {{user.role}}</view>
       </view>
+      <view class="role-pill">{{user.role}}</view>
     </view>
     <view class="profile-form">
-      <view class="section-subtitle">个人信息维护</view>
+      <view class="section-subtitle"><text class="chip-icon">✎</text>个人信息维护</view>
       <input class="input standalone" placeholder="昵称" value="{{profileForm.nickname}}" bindinput="onProfileNickname" />
       <input class="input standalone" placeholder="手机号" value="{{profileForm.phone}}" bindinput="onProfilePhone" />
       <input class="input standalone" placeholder="邮箱" value="{{profileForm.email}}" bindinput="onProfileEmail" />
-      <button class="primary full" bindtap="saveProfile">保存个人信息</button>
+      <button class="primary full" bindtap="saveProfile"><text class="btn-icon">✓</text>保存个人信息</button>
     </view>
     <view class="key-box">
       <view class="label">当前 APIKEY</view>
       <view class="key-value">{{apiKey}}</view>
     </view>
     <view class="button-row">
-      <button class="ghost action" bindtap="copyApiKey">复制 Key</button>
-      <button class="ghost action" bindtap="rotateApiKey">重新生成</button>
+      <button class="ghost action" bindtap="copyApiKey"><text class="btn-icon">⧉</text>复制 Key</button>
+      <button class="ghost action" bindtap="rotateApiKey"><text class="btn-icon">↻</text>重新生成</button>
     </view>
-    <button wx:if="{{user.role === 'maintainer' || user.role === 'admin'}}" class="primary full top-gap" bindtap="openAdmin">进入数据维护</button>
-    <button class="danger full top-gap" bindtap="logout">退出登录</button>
+    <button wx:if="{{user.role === 'maintainer' || user.role === 'admin'}}" class="primary full top-gap" bindtap="openAdmin"><text class="btn-icon">✦</text>进入数据维护</button>
+    <button class="danger full top-gap" bindtap="logout"><text class="btn-icon">⎋</text>退出登录</button>
   </view>
 
   <view class="section surface" wx:if="{{!user}}">
-    <view class="section-title">登录</view>
+    <view class="section-title"><text class="title-icon">→</text>登录</view>
     <input class="input standalone" placeholder="用户名" value="{{login.username}}" bindinput="onLoginUsername" />
     <input class="input standalone" password placeholder="密码" value="{{login.password}}" bindinput="onLoginPassword" />
-    <button class="primary full" bindtap="loginUser">登录</button>
+    <button class="primary full" bindtap="loginUser"><text class="btn-icon">→</text>登录</button>
     <view class="hint">演示公众账号：demo / Demo@123456；维护账号：admin / Admin@123456。</view>
   </view>
 
   <view class="section surface" wx:if="{{!user}}">
-    <view class="section-title">注册公众用户</view>
+    <view class="section-title"><text class="title-icon">＋</text>注册公众用户</view>
     <input class="input standalone" placeholder="用户名" value="{{register.username}}" bindinput="onRegisterUsername" />
     <input class="input standalone" password placeholder="密码" value="{{register.password}}" bindinput="onRegisterPassword" />
     <input class="input standalone" placeholder="昵称" value="{{register.nickname}}" bindinput="onRegisterNickname" />
-    <button class="secondary full" bindtap="registerUser">注册并获取 APIKEY</button>
+    <button class="secondary full" bindtap="registerUser"><text class="btn-icon">＋</text>注册并获取 APIKEY</button>
   </view>
 
   <view class="section surface debug-section">
     <view class="debug-head" bindtap="toggleDebugConfig">
       <view>
-        <view class="section-title compact-title">调试配置</view>
+        <view class="section-title compact-title"><text class="title-icon">⌘</text>调试配置</view>
         <view class="section-desc">仅用于本机/真机联调切换 API 地址，正式演示应固定在 config.js 或 HTTPS 域名。</view>
       </view>
       <view class="debug-toggle">{{showDebugConfig ? '收起' : '展开'}}</view>
@@ -66,8 +72,8 @@
         <input class="input" value="{{apiKey}}" bindinput="onApiKeyInput" />
       </view>
       <view class="button-row">
-        <button class="primary action" bindtap="saveConfig">保存配置</button>
-        <button class="ghost action" bindtap="copyApiKey">复制 Key</button>
+        <button class="primary action" bindtap="saveConfig"><text class="btn-icon">✓</text>保存配置</button>
+        <button class="ghost action" bindtap="copyApiKey"><text class="btn-icon">⧉</text>复制 Key</button>
       </view>
     </view>
   </view>

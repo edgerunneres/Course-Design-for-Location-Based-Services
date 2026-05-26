@@ -8,9 +8,9 @@
   ],
   "window": {
     "navigationBarTitleText": "文保单位 LBS",
-    "navigationBarBackgroundColor": "#10231f",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#f4f1e8"
+    "navigationBarBackgroundColor": "#f7f8f5",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f5f5f7"
   },
   "permission": {
     "scope.userLocation": {
@@ -18,9 +18,9 @@
     }
   },
   "tabBar": {
-    "color": "#5d655f",
-    "selectedColor": "#10231f",
-    "backgroundColor": "#ffffff",
+    "color": "#6b7672",
+    "selectedColor": "#0a84ff",
+    "backgroundColor": "#fdfdfb",
     "borderStyle": "black",
     "list": [
       {

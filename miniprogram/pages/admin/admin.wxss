@@ -1,16 +1,35 @@
 .admin-page {
   padding: 24rpx;
-  background: #f4f1e8;
+  background: #f5f5f7;
 }
 
 .admin-hero {
   padding: 26rpx 4rpx 24rpx;
 }
 
+.hero-lockup {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+}
+
+.hero-icon {
+  width: 76rpx;
+  height: 76rpx;
+  border-radius: 22rpx;
+  line-height: 76rpx;
+  text-align: center;
+  flex: none;
+  background: linear-gradient(145deg, #1d1d1f, #3a3a3c);
+  color: #0a84ff;
+  font-size: 36rpx;
+  box-shadow: 0 16rpx 30rpx rgba(0, 0, 0, 0.18);
+}
+
 .hero-title {
   font-size: 42rpx;
   font-weight: 900;
-  color: #10231f;
+  color: #1d1d1f;
 }
 
 .hero-subtitle {
@@ -21,14 +40,14 @@
 }
 
 .section {
-  padding: 24rpx;
+  padding: 26rpx;
   margin-bottom: 22rpx;
 }
 
 .section-title {
   font-size: 31rpx;
   font-weight: 900;
-  color: #10231f;
+  color: #1d1d1f;
   margin-bottom: 16rpx;
 }
 
@@ -59,7 +78,6 @@
 .search-btn {
   width: 132rpx;
   height: 72rpx;
-  line-height: 72rpx;
   font-size: 26rpx;
   font-weight: 700;
 }
@@ -68,13 +86,13 @@
 .readonly-id {
   min-height: 72rpx;
   line-height: 72rpx;
-  border: 1px solid #ded8c9;
-  border-radius: 12rpx;
+  border: 1px solid rgba(29, 29, 31, 0.09);
+  border-radius: 14rpx;
   padding: 0 18rpx;
   margin-bottom: 16rpx;
   background: #fff;
   box-sizing: border-box;
-  color: #17231f;
+  color: #1d1d1f;
   font-size: 26rpx;
   overflow: hidden;
   white-space: nowrap;
@@ -82,15 +100,15 @@
 }
 
 .readonly-id {
-  background: #fbfaf5;
+  background: #fbfbf7;
   color: #68736d;
 }
 
 .textarea {
   width: 100%;
   min-height: 160rpx;
-  border: 1px solid #ded8c9;
-  border-radius: 12rpx;
+  border: 1px solid rgba(29, 29, 31, 0.09);
+  border-radius: 14rpx;
   padding: 18rpx;
   box-sizing: border-box;
   margin-bottom: 16rpx;
@@ -100,7 +118,6 @@
 .full {
   width: 100%;
   height: 74rpx;
-  line-height: 74rpx;
   font-size: 27rpx;
   font-weight: 700;
 }
@@ -112,7 +129,6 @@
 .action {
   flex: 1;
   height: 74rpx;
-  line-height: 74rpx;
   font-size: 27rpx;
   font-weight: 700;
 }
