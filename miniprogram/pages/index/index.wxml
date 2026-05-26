@@ -6,9 +6,14 @@
     longitude="{{center.lng}}"
     scale="{{scale}}"
     show-location
+    enable-scroll="{{true}}"
+    enable-zoom="{{true}}"
+    enable-rotate="{{false}}"
+    enable-overlooking="{{false}}"
+    enable-3D="{{false}}"
     markers="{{markers}}"
+    circles="{{circles}}"
     bindmarkertap="onMarkerTap"
-    bindregionchange="onRegionChange"
   />
   <view class="center-target">
     <view class="target-ring"></view>

@@ -23,6 +23,7 @@ Page({
     },
     pois: [],
     markers: [],
+    circles: [],
     pagination: { total: 0, page: 1, pageSize: 80 },
     loading: false,
     userLocation: null,
@@ -39,6 +40,8 @@ Page({
     this.sheetStartHeight = this.data.sheetHeight;
     this.windowHeight = this.getWindowHeight();
     this.currentSpatialQuery = null;
+    this.userLocation = null;
+    this.lastLocationRenderAt = 0;
     this.initMarkerCluster();
     if (this.ensureLoggedIn()) {
       this.startLocationWatch();
@@ -93,9 +96,12 @@ Page({
     if (typeof wx.startLocationUpdate !== "function" || typeof wx.onLocationChange !== "function") return;
     this.locationWatching = true;
     this.handleLocationChange = (res) => {
-      this.setData({
-        userLocation: { lat: res.latitude, lng: res.longitude }
-      });
+      this.userLocation = { lat: res.latitude, lng: res.longitude };
+      const now = Date.now();
+      if (now - this.lastLocationRenderAt > 5000) {
+        this.lastLocationRenderAt = now;
+        this.setData({ userLocation: this.userLocation });
+      }
     };
     wx.onLocationChange(this.handleLocationChange);
     wx.startLocationUpdate({
@@ -163,14 +169,7 @@ Page({
           joinCluster: true,
           width: 28,
           height: 28,
-          callout: {
-            content: item.name,
-            display: "BYCLICK",
-            padding: 8,
-            borderRadius: 4,
-            bgColor: "#ffffff",
-            color: "#10231f"
-          }
+          title: item.name
         }));
       const subtitle = this.describeResult(data.pagination.total, data.items.length, extra);
       this.setData({
@@ -202,18 +201,6 @@ Page({
     this.mapContext.includePoints({
       points,
       padding: [110, 48, 420, 48]
-    });
-  },
-
-  syncMapViewport(event = {}) {
-    if (!this.mapContext || typeof this.mapContext.getCenterLocation !== "function") return;
-    const next = {};
-    if (event.detail && event.detail.scale) next.scale = event.detail.scale;
-    this.mapContext.getCenterLocation({
-      success: (res) => {
-        next.center = { lat: res.latitude, lng: res.longitude };
-        this.setData(next);
-      }
     });
   },
 
@@ -274,9 +261,8 @@ Page({
     const radius = this.data.radiusMeters[this.data.radiusIndex] || 10000;
     const run = (center) => {
       this.setData({
-        center,
-        scale: this.scaleForRadius(radius),
-        lastMode: "center"
+        lastMode: "center",
+        circles: [this.createRadiusCircle(center, radius)]
       });
       this.currentSpatialQuery = {
         center: `${center.lng},${center.lat}`,
@@ -293,6 +279,17 @@ Page({
       success: (res) => run({ lat: res.latitude, lng: res.longitude }),
       fail: () => run(this.data.center)
     });
+  },
+
+  createRadiusCircle(center, radius) {
+    return {
+      latitude: center.lat,
+      longitude: center.lng,
+      radius,
+      color: "#a4382f88",
+      fillColor: "#a4382f18",
+      strokeWidth: 2
+    };
   },
 
   loadByMapBounds() {
@@ -332,6 +329,9 @@ Page({
   refreshCenterRadiusQuery() {
     const radius = this.data.radiusMeters[this.data.radiusIndex] || 10000;
     const run = (center) => {
+      this.setData({
+        circles: [this.createRadiusCircle(center, radius)]
+      });
       this.currentSpatialQuery = {
         center: `${center.lng},${center.lat}`,
         radius,
@@ -347,12 +347,6 @@ Page({
       success: (res) => run({ lat: res.latitude, lng: res.longitude }),
       fail: () => run(this.data.center)
     });
-  },
-
-  onRegionChange(event) {
-    if (event.type === "end") {
-      this.syncMapViewport(event);
-    }
   },
 
   onSheetTouchStart(event) {
@@ -409,7 +403,8 @@ Page({
       filters: { name: "", province: "", category: "", hasExt: false },
       lastMode: "normal",
       center: DEFAULT_CENTER,
-      scale: DEFAULT_SCALE
+      scale: DEFAULT_SCALE,
+      circles: []
     });
     this.loadPois({ fit: true });
   },
