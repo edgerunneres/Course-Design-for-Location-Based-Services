@@ -10,6 +10,40 @@
   height: 100vh;
 }
 
+.center-target {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 54rpx;
+  height: 54rpx;
+  margin-left: -27rpx;
+  margin-top: -27rpx;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.target-ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 54rpx;
+  height: 54rpx;
+  border: 4rpx solid #a4382f;
+  border-radius: 999rpx;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.46);
+}
+
+.target-dot {
+  position: absolute;
+  left: 22rpx;
+  top: 22rpx;
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 999rpx;
+  background: #a4382f;
+}
+
 .search-console {
   position: absolute;
   top: 24rpx;
@@ -75,14 +109,14 @@
 }
 
 .quick-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr 0.78fr 0.78fr 0.78fr;
   gap: 12rpx;
   margin-top: 16rpx;
   overflow: hidden;
 }
 
 .quick-chip {
-  flex: 1;
   min-height: 58rpx;
   line-height: 58rpx;
   text-align: center;
@@ -90,6 +124,11 @@
   background: #eef1ed;
   color: #17231f;
   font-size: 24rpx;
+}
+
+.radius-chip {
+  background: #fff8e4;
+  color: #6c4f0e;
 }
 
 .quick-chip.active {
@@ -239,6 +278,20 @@
   font-size: 24rpx;
   color: #4d5a54;
   line-height: 1.45;
+}
+
+.poi-extra {
+  margin-top: 8rpx;
+  padding: 10rpx 12rpx;
+  border-radius: 10rpx;
+  background: #fbf2d7;
+  color: #6c4f0e;
+  font-size: 22rpx;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .poi-side {

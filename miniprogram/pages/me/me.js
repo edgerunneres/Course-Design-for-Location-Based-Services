@@ -8,6 +8,7 @@ Page({
     user: null,
     userInitial: "用",
     showDebugConfig: false,
+    profileForm: { nickname: "", phone: "", email: "" },
     register: { username: "", password: "", nickname: "" },
     login: { username: "", password: "" }
   },
@@ -17,11 +18,17 @@ Page({
   },
 
   refreshState() {
+    const user = app.globalData.user;
     this.setData({
       apiBase: app.globalData.apiBase,
       apiKey: app.globalData.apiKey,
-      user: app.globalData.user,
-      userInitial: this.getInitial(app.globalData.user)
+      user,
+      userInitial: this.getInitial(user),
+      profileForm: {
+        nickname: user ? user.nickname || "" : "",
+        phone: user ? user.phone || "" : "",
+        email: user ? user.email || "" : ""
+      }
     });
   },
 
@@ -45,6 +52,9 @@ Page({
   onRegisterNickname(e) { this.setData({ "register.nickname": e.detail.value }); },
   onLoginUsername(e) { this.setData({ "login.username": e.detail.value }); },
   onLoginPassword(e) { this.setData({ "login.password": e.detail.value }); },
+  onProfileNickname(e) { this.setData({ "profileForm.nickname": e.detail.value }); },
+  onProfilePhone(e) { this.setData({ "profileForm.phone": e.detail.value }); },
+  onProfileEmail(e) { this.setData({ "profileForm.email": e.detail.value }); },
 
   saveConfig() {
     api.saveAuth({ apiBase: this.data.apiBase, apiKey: this.data.apiKey });
@@ -91,6 +101,20 @@ Page({
       api.saveAuth({ apiKey: data.user.apiKey, user: data.user });
       this.refreshState();
       wx.showToast({ title: "已更新 APIKEY", icon: "success" });
+    } catch (error) {
+      wx.showToast({ title: error.message, icon: "none" });
+    }
+  },
+
+  async saveProfile() {
+    try {
+      const data = await api.request("/users/me", {
+        method: "PATCH",
+        data: this.data.profileForm
+      });
+      api.saveAuth({ user: data.user });
+      this.refreshState();
+      wx.showToast({ title: "资料已保存", icon: "success" });
     } catch (error) {
       wx.showToast({ title: error.message, icon: "none" });
     }

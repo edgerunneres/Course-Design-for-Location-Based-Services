@@ -10,6 +10,10 @@
     bindmarkertap="onMarkerTap"
     bindregionchange="onRegionChange"
   />
+  <view class="center-target">
+    <view class="target-ring"></view>
+    <view class="target-dot"></view>
+  </view>
 
   <view class="search-console surface">
     <view class="brand-row">
@@ -27,7 +31,10 @@
 
     <view class="quick-row">
       <view class="quick-chip {{lastMode === 'bounds' ? 'active' : ''}}" bindtap="loadByMapBounds">当前视野</view>
-      <view class="quick-chip {{lastMode === 'nearby' ? 'active' : ''}}" bindtap="loadNearby">周边 10km</view>
+      <view class="quick-chip {{lastMode === 'center' ? 'active' : ''}}" bindtap="loadByCenterRadius">中心半径</view>
+      <picker mode="selector" range="{{radiusOptions}}" value="{{radiusIndex}}" bindchange="onRadiusChange">
+        <view class="quick-chip radius-chip">{{radiusOptions[radiusIndex]}}</view>
+      </picker>
       <view class="quick-chip" bindtap="locateMe">定位</view>
       <view class="quick-chip muted" bindtap="clearFilters">重置</view>
     </view>
@@ -69,6 +76,7 @@
           <view class="poi-title">{{item.name}}</view>
           <view class="poi-meta">{{item.province}} · {{item.type}} · {{item.batch}}</view>
           <view class="poi-address">{{item.address}}</view>
+          <view wx:if="{{item.hasExt}}" class="poi-extra">{{item.remark || item.website || '含图片/链接等扩展资料'}}</view>
         </view>
         <view class="poi-side">
           <view wx:if="{{item.distance}}" class="distance">{{item.distance}}m</view>

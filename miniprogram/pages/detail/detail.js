@@ -54,9 +54,25 @@ Page({
     });
   },
 
+  previewImage() {
+    const url = this.data.item && this.data.item.imageUrl;
+    if (!url) return;
+    wx.previewImage({
+      urls: [url],
+      current: url
+    });
+  },
+
   copyWebsite() {
     wx.setClipboardData({
       data: this.data.item.website
+    });
+  },
+
+  copyCoordinates() {
+    const item = this.data.item;
+    wx.setClipboardData({
+      data: `WGS84: ${item.lng}, ${item.lat}\nGCJ-02: ${item.gcjLng}, ${item.gcjLat}\nBD-09: ${item.bdLng}, ${item.bdLat}`
     });
   }
 });

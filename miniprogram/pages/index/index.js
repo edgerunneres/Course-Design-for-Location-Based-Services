@@ -8,6 +8,9 @@ Page({
     center: DEFAULT_CENTER,
     scale: DEFAULT_SCALE,
     sheetState: "half",
+    radiusOptions: ["2km", "5km", "10km", "20km", "50km"],
+    radiusMeters: [2000, 5000, 10000, 20000, 50000],
+    radiusIndex: 2,
     categories: ["全部类别"],
     provinces: ["全部省份"],
     filters: {
@@ -23,7 +26,7 @@ Page({
     userLocation: null,
     lastMode: "normal",
     resultTitle: "精选文保点",
-    resultSubtitle: "支持名称、省份、类别、视野范围和周边半径查询"
+    resultSubtitle: "支持名称、省份、类别、视野范围和中心半径查询"
   },
 
   onLoad() {
@@ -102,7 +105,7 @@ Page({
             color: "#10231f"
           }
         }));
-      const subtitle = this.describeResult(data.pagination.total, data.items.length);
+      const subtitle = this.describeResult(data.pagination.total, data.items.length, extra);
       this.setData({
         pois: data.items,
         pagination: data.pagination,
@@ -148,21 +151,37 @@ Page({
   },
 
   getResultTitle(extra = {}) {
-    if (extra.center) return "周边文保单位";
+    if (extra.center) return "中心半径结果";
     if (extra.bbox) return "当前视野结果";
     if (this.data.filters.name) return `搜索：${this.data.filters.name}`;
     if (this.data.filters.province || this.data.filters.category || this.data.filters.hasExt) return "筛选结果";
     return "精选文保点";
   },
 
-  describeResult(total, shown) {
+  describeResult(total, shown, extra = {}) {
     const filters = this.data.filters;
     const chips = [];
+    if (extra.center && extra.radius) chips.push(`半径 ${this.formatRadius(extra.radius)}`);
     if (filters.province) chips.push(filters.province);
     if (filters.category) chips.push(filters.category);
     if (filters.hasExt) chips.push("含扩展信息");
     const suffix = chips.length ? ` · ${chips.join(" · ")}` : "";
     return `共 ${total} 条，当前显示 ${shown} 条${suffix}`;
+  },
+
+  formatRadius(radius) {
+    const value = Number(radius);
+    if (!Number.isFinite(value)) return "";
+    return value >= 1000 ? `${Math.round(value / 1000)}km` : `${value}m`;
+  },
+
+  scaleForRadius(radius) {
+    const value = Number(radius);
+    if (value <= 2000) return 13;
+    if (value <= 5000) return 12;
+    if (value <= 10000) return 11;
+    if (value <= 20000) return 10;
+    return 8;
   },
 
   locateMe(showToast = true) {
@@ -179,29 +198,31 @@ Page({
     });
   },
 
-  loadNearby() {
-    const userLocation = this.data.userLocation;
-    if (!userLocation) {
-      wx.getLocation({
-        type: "gcj02",
-        success: (res) => {
-          const nextLocation = { lat: res.latitude, lng: res.longitude };
-          this.setData({ userLocation: nextLocation, center: nextLocation, scale: 12, lastMode: "nearby" });
-          this.loadPois({
-            center: `${nextLocation.lng},${nextLocation.lat}`,
-            radius: 10000,
-            fit: true
-          });
-        },
-        fail: () => this.toast("请先授权位置权限")
+  onRadiusChange(event) {
+    this.setData({ radiusIndex: Number(event.detail.value) });
+  },
+
+  loadByCenterRadius() {
+    const radius = this.data.radiusMeters[this.data.radiusIndex] || 10000;
+    const run = (center) => {
+      this.setData({
+        center,
+        scale: this.scaleForRadius(radius),
+        lastMode: "center"
       });
+      this.loadPois({
+        center: `${center.lng},${center.lat}`,
+        radius,
+        preserveViewport: true
+      });
+    };
+    if (!this.mapContext || typeof this.mapContext.getCenterLocation !== "function") {
+      run(this.data.center);
       return;
     }
-    this.setData({ lastMode: "nearby" });
-    this.loadPois({
-      center: `${userLocation.lng},${userLocation.lat}`,
-      radius: 10000,
-      fit: true
+    this.mapContext.getCenterLocation({
+      success: (res) => run({ lat: res.latitude, lng: res.longitude }),
+      fail: () => run(this.data.center)
     });
   },
 

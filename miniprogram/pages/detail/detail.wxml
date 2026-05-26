@@ -19,7 +19,7 @@
 
     <view class="action-grid">
       <button class="primary" bindtap="openLocation">地图导航</button>
-      <button class="ghost" bindtap="copyJson">复制 JSON</button>
+      <button class="ghost" bindtap="copyCoordinates">复制坐标</button>
       <button wx:if="{{item.website}}" class="secondary" bindtap="copyWebsite">资料链接</button>
     </view>
   </view>
@@ -32,17 +32,53 @@
         <view class="value">{{item.address}}</view>
       </view>
       <view class="field">
-        <view class="label">备注</view>
-        <view class="value">{{item.remark || '暂无扩展备注'}}</view>
-      </view>
-      <view class="field">
-        <view class="label">服务坐标</view>
-        <view class="value">GCJ-02 {{item.gcjLng}}, {{item.gcjLat}}</view>
+        <view class="label">时代</view>
+        <view class="value">{{item.age || '时代待考'}}</view>
       </view>
       <view class="field">
         <view class="label">原始编号</view>
         <view class="value">{{item.code}} / {{item.classCode}}</view>
       </view>
+    </view>
+
+    <view class="section-title ext-title">扩展信息</view>
+    <image wx:if="{{item.imageUrl}}" class="heritage-image" mode="aspectFill" src="{{item.imageUrl}}" bindtap="previewImage" />
+    <view class="info-grid">
+      <view class="field highlight">
+        <view class="label">备注</view>
+        <view class="value">{{item.remark || '暂无扩展备注'}}</view>
+      </view>
+      <view class="field" wx:if="{{item.website}}">
+        <view class="label">资料链接</view>
+        <view class="value link-text">{{item.website}}</view>
+      </view>
+      <view class="field">
+        <view class="label">保护批次</view>
+        <view class="value">{{item.batch || '未填'}}</view>
+      </view>
+      <view class="field">
+        <view class="label">数据状态</view>
+        <view class="value">{{item.hasExt ? '含扩展资料' : '基础 POI 数据'}}</view>
+      </view>
+      <view class="field">
+        <view class="label">WGS84 坐标</view>
+        <view class="value">{{item.lng}}, {{item.lat}}</view>
+      </view>
+      <view class="field">
+        <view class="label">GCJ-02 坐标</view>
+        <view class="value">{{item.gcjLng}}, {{item.gcjLat}}</view>
+      </view>
+      <view class="field">
+        <view class="label">BD-09 坐标</view>
+        <view class="value">{{item.bdLng}}, {{item.bdLat}}</view>
+      </view>
+      <view class="field">
+        <view class="label">更新时间</view>
+        <view class="value">{{item.updatedAt}}</view>
+      </view>
+    </view>
+    <view class="button-row detail-actions">
+      <button class="ghost action" bindtap="copyJson">复制完整 JSON</button>
     </view>
   </view>
 </view>

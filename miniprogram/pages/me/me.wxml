@@ -13,6 +13,13 @@
         <view class="profile-meta">{{user.username}} · {{user.role}}</view>
       </view>
     </view>
+    <view class="profile-form">
+      <view class="section-subtitle">个人信息维护</view>
+      <input class="input standalone" placeholder="昵称" value="{{profileForm.nickname}}" bindinput="onProfileNickname" />
+      <input class="input standalone" placeholder="手机号" value="{{profileForm.phone}}" bindinput="onProfilePhone" />
+      <input class="input standalone" placeholder="邮箱" value="{{profileForm.email}}" bindinput="onProfileEmail" />
+      <button class="primary full" bindtap="saveProfile">保存个人信息</button>
+    </view>
     <view class="key-box">
       <view class="label">当前 APIKEY</view>
       <view class="key-value">{{apiKey}}</view>
