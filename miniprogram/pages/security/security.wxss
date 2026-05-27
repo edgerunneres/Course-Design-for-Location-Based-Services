@@ -32,13 +32,6 @@
   color: #1d1d1f;
 }
 
-.hero-subtitle {
-  margin-top: 10rpx;
-  color: #68736d;
-  font-size: 25rpx;
-  line-height: 1.45;
-}
-
 .section {
   padding: 26rpx;
   margin-bottom: 22rpx;
@@ -49,42 +42,6 @@
   font-weight: 900;
   color: #1d1d1f;
   margin-bottom: 16rpx;
-}
-
-.code-row {
-  display: flex;
-  gap: 16rpx;
-  padding: 18rpx 0;
-  border-bottom: 1px solid rgba(29, 29, 31, 0.08);
-}
-
-.code-status {
-  width: 78rpx;
-  height: 52rpx;
-  border-radius: 14rpx;
-  line-height: 52rpx;
-  text-align: center;
-  background: #eef5ff;
-  color: #0a84ff;
-  font-weight: 900;
-}
-
-.code-copy {
-  flex: 1;
-  min-width: 0;
-}
-
-.code-name {
-  color: #1d1d1f;
-  font-size: 27rpx;
-  font-weight: 900;
-}
-
-.code-scene,
-.code-meaning {
-  margin-top: 6rpx;
-  color: #68736d;
-  font-size: 23rpx;
 }
 
 .demo-grid {
