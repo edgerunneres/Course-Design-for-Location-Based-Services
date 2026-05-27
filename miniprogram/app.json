@@ -3,6 +3,7 @@
     "pages/me/me",
     "pages/index/index",
     "pages/detail/detail",
+    "pages/security/security",
     "pages/admin/admin",
     "pages/web/web"
   ],

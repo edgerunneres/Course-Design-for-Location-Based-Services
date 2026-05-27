@@ -38,6 +38,27 @@ function request(path, options = {}) {
   });
 }
 
+function rawRequest(path, options = {}) {
+  return new Promise((resolve, reject) => {
+    wx.request({
+      url: `${getBase()}${path}`,
+      method: options.method || "GET",
+      data: options.data || {},
+      header: options.header === undefined ? getHeaders(options.extraHeader || {}) : options.header,
+      success(res) {
+        resolve({
+          statusCode: res.statusCode,
+          headers: res.header || {},
+          body: res.data
+        });
+      },
+      fail(error) {
+        reject(error);
+      }
+    });
+  });
+}
+
 function saveAuth({ apiBase, apiKey, token, user }) {
   if (apiBase) {
     app.globalData.apiBase = apiBase;
@@ -69,6 +90,7 @@ function clearAuth() {
 module.exports = {
   getBase,
   request,
+  rawRequest,
   saveAuth,
   clearAuth
 };

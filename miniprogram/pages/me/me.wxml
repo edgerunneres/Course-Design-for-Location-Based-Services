@@ -34,6 +34,7 @@
       <button class="ghost action" bindtap="copyApiKey"><text class="btn-icon">⧉</text>复制 Key</button>
       <button class="ghost action" bindtap="rotateApiKey"><text class="btn-icon">↻</text>重新生成</button>
     </view>
+    <button class="ghost full top-gap" bindtap="openSecurity"><text class="btn-icon">⌘</text>API 安全与错误码演示</button>
     <button wx:if="{{user.role === 'maintainer' || user.role === 'admin'}}" class="primary full top-gap" bindtap="openAdmin"><text class="btn-icon">✦</text>进入数据维护</button>
     <button class="danger full top-gap" bindtap="logout"><text class="btn-icon">⎋</text>退出登录</button>
   </view>

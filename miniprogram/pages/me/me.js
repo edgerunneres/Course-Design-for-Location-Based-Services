@@ -146,5 +146,9 @@ Page({
       return;
     }
     wx.navigateTo({ url: "/pages/admin/admin" });
+  },
+
+  openSecurity() {
+    wx.navigateTo({ url: "/pages/security/security" });
   }
 });

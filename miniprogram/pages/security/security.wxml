@@ -1,0 +1,49 @@
+<view class="page security-page">
+  <view class="security-hero">
+    <view class="hero-lockup">
+      <view class="hero-icon">⌘</view>
+      <view>
+        <view class="hero-title">API 安全与错误码</view>
+        <view class="hero-subtitle">用于向老师现场展示认证、授权、限速和标准错误响应。</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section surface">
+    <view class="section-title"><text class="title-icon">!</text>标准错误码</view>
+    <view wx:for="{{errorCodes}}" wx:key="code" class="code-row">
+      <view class="code-status">{{item.status}}</view>
+      <view class="code-copy">
+        <view class="code-name">{{item.code}}</view>
+        <view class="code-scene">{{item.scene}}</view>
+        <view class="code-meaning">{{item.meaning}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section surface">
+    <view class="section-title"><text class="title-icon">▶</text>现场触发演示</view>
+    <view class="demo-grid">
+      <button class="ghost demo-btn" bindtap="demoMissingApiKey">401 APIKEY</button>
+      <button class="ghost demo-btn" bindtap="demoForbiddenRole">403 权限</button>
+      <button class="ghost demo-btn" bindtap="demoRouteNotFound">404 路由</button>
+      <button class="primary demo-btn" loading="{{running}}" bindtap="demoRateLimit">429 限速</button>
+    </view>
+    <view wx:if="{{pressureProgress}}" class="progress-text">{{pressureProgress}}</view>
+    <button class="ghost full top-gap" bindtap="clearResults">清空结果</button>
+  </view>
+
+  <view class="section surface">
+    <view class="section-title"><text class="title-icon">JSON</text>响应结果</view>
+    <view wx:if="{{results.length === 0}}" class="empty">点击上方按钮后，这里会显示服务端返回的状态码、错误码、错误信息和 requestId。</view>
+    <view wx:for="{{results}}" wx:key="requestId" class="result-card">
+      <view class="result-head">
+        <view class="result-title">{{item.title}}</view>
+        <view class="result-status">{{item.statusCode}}</view>
+      </view>
+      <view class="result-code">{{item.code}}</view>
+      <view class="result-message">{{item.message}}</view>
+      <view class="result-id">requestId: {{item.requestId}}</view>
+    </view>
+  </view>
+</view>

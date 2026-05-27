@@ -295,7 +295,45 @@
 }
 
 .poi-list {
-  height: calc(100% - 116rpx);
+  height: calc(100% - 184rpx);
+}
+
+.pager-row {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr 1fr 1fr;
+  gap: 10rpx;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+
+.pager-btn,
+.pager-size,
+.pager-info {
+  height: 52rpx;
+  min-height: 52rpx;
+  border-radius: 14rpx;
+  font-size: 22rpx;
+}
+
+.pager-btn {
+  box-shadow: none;
+}
+
+.pager-btn.disabled {
+  opacity: 0.42;
+}
+
+.pager-size,
+.pager-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7f8fa;
+  color: #4d5a54;
+}
+
+.pager-info {
+  white-space: nowrap;
 }
 
 .poi-item {

@@ -13,6 +13,9 @@ Page({
     radiusOptions: ["2km", "5km", "10km", "20km", "50km"],
     radiusMeters: [2000, 5000, 10000, 20000, 50000],
     radiusIndex: 2,
+    pageSizeOptions: ["20条/页", "50条/页", "80条/页"],
+    pageSizeValues: [20, 50, 80],
+    pageSizeIndex: 0,
     categories: ["全部类别"],
     provinces: ["全部省份"],
     filters: {
@@ -24,7 +27,7 @@ Page({
     pois: [],
     markers: [],
     circles: [],
-    pagination: { total: 0, page: 1, pageSize: 80 },
+    pagination: { total: 0, page: 1, pageSize: 20, pages: 1 },
     loading: false,
     userLocation: null,
     lastMode: "normal",
@@ -139,8 +142,8 @@ Page({
   buildQuery(extra = {}) {
     const filters = this.data.filters;
     const query = {
-      page: 1,
-      pageSize: 80,
+      page: this.data.pagination.page || 1,
+      pageSize: this.data.pageSizeValues[this.data.pageSizeIndex] || 20,
       ...extra
     };
     delete query.fit;
@@ -174,7 +177,10 @@ Page({
       const subtitle = this.describeResult(data.pagination.total, data.items.length, extra);
       this.setData({
         pois: data.items,
-        pagination: data.pagination,
+        pagination: {
+          ...data.pagination,
+          pages: data.pagination.pages || 1
+        },
         markers,
         loading: false,
         resultTitle: this.getResultTitle(extra),
@@ -262,6 +268,7 @@ Page({
     const run = (center) => {
       this.setData({
         lastMode: "center",
+        "pagination.page": 1,
         circles: [this.createRadiusCircle(center, radius)]
       });
       this.currentSpatialQuery = {
@@ -298,7 +305,7 @@ Page({
       success: (res) => {
         const sw = res.southwest;
         const ne = res.northeast;
-        this.setData({ lastMode: "bounds" });
+        this.setData({ lastMode: "bounds", "pagination.page": 1 });
         this.currentSpatialQuery = {
           bbox: `${sw.longitude},${sw.latitude},${ne.longitude},${ne.latitude}`,
           preserveViewport: true
@@ -311,6 +318,7 @@ Page({
 
   searchPois() {
     if (!this.ensureLoggedIn()) return;
+    this.setData({ "pagination.page": 1 });
     this.reloadCurrentQuery();
   },
 
@@ -378,6 +386,7 @@ Page({
     const value = this.data.provinces[event.detail.value];
     this.setData({
       "filters.province": value === "全部省份" ? "" : value,
+      "pagination.page": 1
     });
     this.reloadCurrentQuery();
   },
@@ -386,14 +395,39 @@ Page({
     const value = this.data.categories[event.detail.value];
     this.setData({
       "filters.category": value === "全部类别" ? "" : value,
+      "pagination.page": 1
     });
     this.reloadCurrentQuery();
   },
 
   toggleExt() {
     this.setData({
-      "filters.hasExt": !this.data.filters.hasExt
+      "filters.hasExt": !this.data.filters.hasExt,
+      "pagination.page": 1
     });
+    this.reloadCurrentQuery();
+  },
+
+  onPageSizeChange(event) {
+    this.setData({
+      pageSizeIndex: Number(event.detail.value),
+      "pagination.page": 1
+    });
+    this.reloadCurrentQuery();
+  },
+
+  prevPage() {
+    const page = this.data.pagination.page || 1;
+    if (page <= 1) return;
+    this.setData({ "pagination.page": page - 1 });
+    this.reloadCurrentQuery();
+  },
+
+  nextPage() {
+    const page = this.data.pagination.page || 1;
+    const pages = this.data.pagination.pages || 1;
+    if (page >= pages) return;
+    this.setData({ "pagination.page": page + 1 });
     this.reloadCurrentQuery();
   },
 
@@ -401,6 +435,7 @@ Page({
     this.currentSpatialQuery = null;
     this.setData({
       filters: { name: "", province: "", category: "", hasExt: false },
+      "pagination.page": 1,
       lastMode: "normal",
       center: DEFAULT_CENTER,
       scale: DEFAULT_SCALE,

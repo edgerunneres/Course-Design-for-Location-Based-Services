@@ -80,6 +80,15 @@
       <button class="small-btn ghost" bindtap="searchPois"><text class="btn-icon">↻</text>刷新</button>
     </view>
 
+    <view class="pager-row">
+      <button class="pager-btn ghost {{pagination.page <= 1 ? 'disabled' : ''}}" bindtap="prevPage">上一页</button>
+      <view class="pager-info">第 {{pagination.page || 1}} / {{pagination.pages || 1}} 页</view>
+      <picker mode="selector" range="{{pageSizeOptions}}" value="{{pageSizeIndex}}" bindchange="onPageSizeChange">
+        <view class="pager-size">{{pageSizeOptions[pageSizeIndex]}}</view>
+      </picker>
+      <button class="pager-btn ghost {{pagination.page >= pagination.pages ? 'disabled' : ''}}" bindtap="nextPage">下一页</button>
+    </view>
+
     <scroll-view class="poi-list" scroll-y enhanced show-scrollbar="{{false}}">
       <view wx:for="{{pois}}" wx:key="id" class="poi-item" data-id="{{item.id}}" bindtap="openDetail">
         <view class="poi-icon">⌖</view>
